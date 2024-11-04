@@ -8,10 +8,10 @@ import './App.css';
 export default function App() {
   return (
     <Routes>
-      <Route path="/"element={<LandingPage></LandingPage>}> </Route>
-      <Route path="/About"element={<About></About>}> </Route>
-      <Route path="/Login"element={<Login></Login>}> </Route>
-      <Route path="/CreateUser"element={<CreateUser></CreateUser>}> </Route>
+      <Route path="/"element={<LandingPage />} />
+      <Route path="/about"element={<About />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/createUser"element={<CreateUser />} />
     </Routes>
   );
 }
