@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    overflow-x: hidden;
+}
+.LandingPage, .infoDivContainer, .infoContainer, .aboutButtonContainer {
+    display: flex;
+}
+
+.LandingPage {
+    padding: 0;
+    margin: 0;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.LandingPageH1 {
+    margin: 0;
+    color: var(--white);
+    font-size: 70px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+}
+
+.chattern {
+    font-size: 60px;
+    margin: 100px 0 61px 0;
+}
+
+.welcome {
+    margin: 230px 0 18px 0;
+}
+
+.LandingPageHr {
+    margin: 0;
+    width: 446px;
+    border: var(--yellow) solid 1px;
+}
+
+
+.loginButton {
+    cursor: pointer;
+    background-color: var(--yellow);
+    border: none;
+    width: 319px;
+    height: 83px;
+    border-radius: 134px;
+    font-size: 40px;
+    font-family: Josefin Sans;
+    margin: 0;
+}
+
+.loginA {
+    margin: 0 0 18px 0;
+}
+
+.signupButton {
+    cursor: pointer;
+    background-color: var(--black);
+    color: var(--yellow);
+    border: none;
+    width: 216px;
+    height: 68px    ;
+    border-radius: 134px;
+    font-size: 30px;
+    font-family: Josefin Sans;
+    margin: 0;
+}
+
+.signupA {
+    margin: 0 0 321px 0;
+}
+
+.infoContainer {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.infoDivContainer {
+    flex-direction: row;
+    margin: 0 75px 75px 75px;
+}
+
+.infoH2 {
+    color: var(--white);
+    font-size: 70px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    letter-spacing: 0%;
+    text-align: center;
+    margin: 0 0 30px 0;
+}
+
+.infoDiv {
+    background-color: #d9d9d9;
+}
+
+.infoDiv1 {
+    margin: 0 50px 0 0;
+    width: 601px;
+    height: 764px;
+}
+
+.infoDiv2 {
+    margin: 0 0 0 50px;
+    width: 601px;
+    height: 585px;
+}
+
+.aboutButton {
+    cursor: pointer;
+    width: 190px;
+    height: 70px;
+    border-radius: 134px;
+    border: none;
+    background-color: var(--yellow);
+    font-size: 40px;
+    font-family: Josefin Sans;
+}
+
+.aboutButtonContainer {
+    padding: 24px 24px 0 0;
+    justify-content: end;
+}
