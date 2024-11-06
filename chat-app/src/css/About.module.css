@@ -1,0 +1,160 @@
+.aboutParent {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    overflow-y: hidden;
+}
+
+.aboutDiv1 { grid-area: 1 / 11 / 2 / 15; }
+.aboutDiv2 { grid-area: 1 / 1 / 2 / 11; }
+.aboutDiv3 { grid-area: 2 / 1 / 6 / 11; }
+.aboutDiv4 { grid-area: 2 / 11 / 6 / 15; }
+
+.aboutDiv4, .aboutDiv2, .aboutDiv3, .aboutInfoContainer, .aboutDiv1, .aboutInfoHeader {
+    display: flex;
+}
+
+.aboutImage {
+    margin: 60px 0 0 25px;
+    border: 6px solid var(--yellow);
+    object-fit: cover;
+    width: 373px;
+    height: 596px;
+}
+
+.welcome {
+    margin: 0 0 20px 0;
+    font-size: 70px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    text-align: center;
+}
+
+.aboutDiv1, .aboutDiv4 {
+    color: var(--white);
+    background-color: var(--bg-color);
+}
+
+.aboutDiv1 {
+    align-items: end;
+    justify-content: center;
+    border-bottom: 1px solid var(--yellow);
+}
+
+.aboutDiv3 {
+    height: fit-content;
+}
+
+.aboutDiv2, .aboutDiv3 {
+    background-color: var(--dark);
+}
+
+.aboutDiv2 {
+    border-bottom: 1px solid var(--white);
+    align-items: end;
+    justify-content: end;
+}
+
+.aboutDiv4 {
+    flex-direction: column;
+    align-items: center;
+}
+
+.aboutInfoImageContainer {
+    z-index: 10;
+    position: relative;
+    width: 50%;
+}
+
+.aboutInfoText {
+    border-radius: 24px;
+    background-color: var(--grey);
+    position: relative;
+    margin-top:-538px;
+    color: var(--other-green);
+    height: 80vh;
+}
+
+.aboutInfoText p {
+    font-size: 28px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    letter-spacing: 0%;
+    margin: 70px 20px 20px 450px;
+}
+
+.aboutInfoHead {
+    width: 50%;
+}
+
+.aboutInfoHead h1 {
+    margin: 60px 175px 0 0;
+    color: var(--yellow);
+    font-size: 45px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    text-align: center;
+}
+
+.aboutInfoContainer {
+    flex-direction: column;
+    height: auto;
+    border-radius: 24px;
+    width: 100%;
+    margin: 32px;
+    background-color: var(--green);
+}
+.aboutInfoHeader {
+    flex-direction: row;
+}
+
+.aboutH1 {
+    color: var(--white);
+    font-size: 60px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+}
+
+.info {
+    margin: 0 70px 20px 0;
+    color: var(--white);
+    font-size: 60px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+}
+
+.loginButton {
+    cursor: pointer;
+    background-color: var(--yellow);
+    border: none;
+    width: 319px;
+    height: 83px;
+    border-radius: 134px;
+    font-size: 40px;
+    font-family: Josefin Sans;
+    margin: 0;
+}
+
+.loginA {
+    margin: 0 0 18px 0;
+}
+
+.signupButton {
+    cursor: pointer;
+    background-color: var(--black);
+    color: var(--yellow);
+    border: none;
+    width: 216px;
+    height: 68px    ;
+    border-radius: 134px;
+    font-size: 30px;
+    font-family: Josefin Sans;
+    margin: 0;
+}
+
+.signupA {
+    margin: 0 0 321px 0;
+}

@@ -3,73 +3,78 @@ body {
     background-color: var(--bg-color);
     overflow-x: hidden;
 }
-.LandingPage, .infoDivContainer, .infoContainer, .aboutButtonContainer {
+
+.infoDivContainer, .infoContainer, .aboutButtonContainer, .loginHr, .loginForm, .loginForm form {
     display: flex;
 }
 
-.LandingPage {
-    padding: 0;
-    margin: 0;
+.loginLi {
+    color: var(--white);
+    list-style-type: none;
+    font-size: 60px;
+    font-family: Josefin Sans;
+}
+  
+.loginUl {
+    justify-self: center;
+    width: 50%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.loginHr {
+    margin: 0 0 86px 0;
+    width: 446px;
+    border: var(--yellow) solid 1px;
+    justify-self: center;
+}
+
+.loginText {
+    color: var(--white);
+    font-size: 40px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    text-align: center;
+    margin: 0 0 46px 0;
+}
+
+.loginForm {
     flex-direction: column;
     align-items: center;
 }
 
-
-.LandingPageH1 {
-    margin: 0;
-    color: var(--white);
-    font-size: 70px;
-    font-family: Josefin Sans;
-    font-weight: 400;
-}
-
-.chattern {
-    font-size: 60px;
-    margin: 100px 0 61px 0;
-}
-
-.welcome {
-    margin: 230px 0 18px 0;
-}
-
-.LandingPageHr {
-    margin: 0;
-    width: 446px;
-    border: var(--yellow) solid 1px;
-}
-
-
-.loginButton {
-    cursor: pointer;
-    background-color: var(--yellow);
+.loginInput {
+    background-color: var(--light-grey);
+    width: 452px;
+    height: 51px;
     border: none;
-    width: 319px;
-    height: 83px;
-    border-radius: 134px;
+    margin: 29px 0 0 0;
+}
+
+.loginSubmit {
+    background-color: var(--yellow);
     font-size: 40px;
     font-family: Josefin Sans;
-    margin: 0;
+    font-weight: 400;
+    text-align: center;
+    border-radius: 9px;
+    width: 366px;
+    margin: 19px 0 98px 0;
+    cursor: pointer;
+}
+
+.loginH1 {
+    color: var(--white);
+    font-size: 30px;
+    font-family: Josefin Sans;
+    font-weight: 400;
+    text-align: center;
+    margin: 0 0 277px 0;
 }
 
 .loginA {
-    margin: 0 0 18px 0;
-}
-
-.signupButton {
     cursor: pointer;
-    background-color: var(--black);
     color: var(--yellow);
-    border: none;
-    width: 216px;
-    height: 68px    ;
-    border-radius: 134px;
-    font-size: 30px;
-    font-family: Josefin Sans;
-    margin: 0;
-}
-
-.signupA {
-    margin: 0 0 321px 0;
 }
 
 .infoContainer {
@@ -82,6 +87,7 @@ body {
     flex-direction: row;
     margin: 0 75px 75px 75px;
 }
+
 
 .infoH2 {
     color: var(--white);
