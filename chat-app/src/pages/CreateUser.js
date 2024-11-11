@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "../css/CreateUser.module.css";
+import Info from "../components/Info.js"
+import AboutButton from "../components/AboutButton.js"
 
 export default function CreateUser() {
     const [email, setEmail] = useState("");
@@ -36,11 +38,7 @@ export default function CreateUser() {
 
     return (
         <>
-        <div className={styles.createUserAboutButtonContainer}>
-            <a href='/about' className={styles.createUserAboutA}>
-                <button className={styles.createUserAboutButton}> About us </button>
-            </a>
-        </div>
+        <AboutButton />
 
         <ul className={styles.createUserLoginUl}>
             <li className={styles.createUserLoginLi}>Welcome</li>
@@ -75,13 +73,7 @@ export default function CreateUser() {
             </form>
         </div>
         <h1 className={styles.createUserLoginH1}>Already have an account? <a className={styles.createUserLoginA} href='/login'>Login</a></h1>
-        <div className={styles.createUserInfoContainer}>
-            <h2 className={styles.createUserInfoH2}>Bla info bla bla</h2>
-            <div className={styles.createUserInfoDivContainer}>
-                <div className={`${styles.createUserInfoDiv1} ${styles.createUserInfoDiv}`}></div>
-                <div className={`${styles.createUserInfoDiv2} ${styles.createUserInfoDiv}`}></div>
-            </div>
-        </div>
+        <Info />
         </>
     );
 };

@@ -1,19 +1,19 @@
 const jwt = require("jsonwebtoken");
 
-const authenticateJWT = (req, res, next) => {
-  const token = req.cookies.jwt;
+function authenticateJWT(req, res, next) {
+    const token = req.cookies.jwt;
 
-  if (token) {
+    if (!token) {
+        return res.status(403).json({ error: "Access denied" });
+    }
+
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.redirect('/?error=Du må logge inn for å se dette innholdet!');
-      }
-      req.user = user;
-      next();
+        if (err) {
+            return res.status(403).json({ error: "Access denied" });
+        }
+        req.userId = user.userId;
+        next();
     });
-  } else {
-    res.redirect('/?error=Du må logge inn for å se dette innholdet!');
-  }
-};
+}
 
 module.exports = authenticateJWT;

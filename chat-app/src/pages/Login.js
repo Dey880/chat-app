@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import styles from "../css/Login.module.css"
+import styles from "../css/Login.module.css";
+import Info from '../components/Info.js';
+import AboutButton from "../components/AboutButton.js"
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -26,7 +28,7 @@ export default function Login() {
                     const token = response.data.token;
                     if (token) {
                         const decoded = jwtDecode(token);
-                        navigate("/About");
+                        navigate('/chat')
                     } else {
                         console.log("No token received.");
                     }
@@ -40,13 +42,7 @@ export default function Login() {
 
     return (
         <>
-
-        <div className={styles.aboutButtonContainer}>
-            <a href='/about' className={styles.aboutA}>
-                <button className={styles.aboutButton}> About us </button>
-            </a>
-        </div>
-
+        <AboutButton />
         <ul className={styles.loginUl}>
             <li className={styles.loginLi}>Welcome</li>
             <li className={styles.loginLi}>To</li>
@@ -62,13 +58,7 @@ export default function Login() {
             </form>
         </div>
         <h1 className={styles.loginH1}>Don't have an account? <a className={styles.loginA} href='/createUser'>Sign up</a></h1>
-        <div className={styles.infoContainer}>
-            <h2 className={styles.infoH2}>Bla info bla bla</h2>
-            <div className={styles.infoDivContainer}>
-                <div className={`${styles.infoDiv1} ${styles.infoDiv}`}></div>
-                <div className={`${styles.infoDiv2} ${styles.infoDiv}`}></div>
-            </div>
-        </div>
+        <Info />
         </>
     );
 };

@@ -1,0 +1,19 @@
+.aboutButtonContainer {
+    display: flex;
+}
+
+.aboutButton {
+    cursor: pointer;
+    width: 190px;
+    height: 70px;
+    border-radius: 134px;
+    border: none;
+    background-color: var(--yellow);
+    font-size: 40px;
+    font-family: Josefin Sans;
+}
+
+.aboutButtonContainer {
+    padding: 24px 24px 0 0;
+    justify-content: end;
+}
