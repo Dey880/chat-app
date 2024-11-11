@@ -50,8 +50,6 @@ app.use(express.json());
 
 const saltRounds = 10;
 
-console.log("THIS IS JULIAN BRANCH")
-
 app.get("/", (req, res) => {
   res.send("hallo");
 });
