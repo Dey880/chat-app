@@ -50,7 +50,6 @@ app.use(express.json());
 
 const saltRounds = 10;
 
-
 app.get("/", (req, res) => {
   res.send("hallo");
 });
