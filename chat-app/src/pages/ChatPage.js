@@ -4,7 +4,7 @@ import ChatRoom from "../components/ChatRoom";
 import io from "socket.io-client";
 
 const socket = io("http://localhost:4000", {
-  withCredentials: true,
+  withCredentials: true,  // This ensures cookies are sent
 });
 
 export default function ChatPage() {
@@ -19,10 +19,16 @@ export default function ChatPage() {
     <div className="chat-page">
       <Sidebar rooms={rooms} selectRoom={setSelectedRoom} />
       {selectedRoom ? (
-        <ChatRoom roomId={selectedRoom} socket={socket} />
-      ) : (
-        <div>Select a room to start chatting!</div>
-      )}
+    <ChatRoom 
+      roomId={selectedRoom} 
+      socket={socket} 
+      userId={JSON.parse(localStorage.getItem('user')).userId} 
+      userEmail={JSON.parse(localStorage.getItem('user')).email} 
+    />
+  ) : (
+    <div>Select a room to start chatting!</div>
+  )}
+
     </div>
   );
 }

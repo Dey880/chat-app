@@ -7,19 +7,28 @@ const jwt = require("jsonwebtoken");
 const http = require("http");
 const { Server } = require("socket.io");
 const cookieParser = require('cookie-parser');
-
-
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app); 
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
+const upload = multer({ storage: storage });
 
 const User = require("./models/user");
 const Message = require("./models/message");
@@ -36,12 +45,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
+app.use(cookieParser());
 app.use(express.json());
 
 const saltRounds = 10;
 
-app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("hallo");
@@ -107,100 +115,129 @@ app.post("/api/login", (req, res) => {
                       { expiresIn: "1h" }
                   );
 
+                  // Set the JWT cookie
                   res.cookie("jwt", token, {
-                      httpOnly: true,
-                      secure: false,
-                      maxAge: 3600000,
-                      sameSite: "Lax"
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production', // set to true for HTTPS in production
+                    maxAge: 3600000,  // 1 hour
+                    sameSite: "Lax",
                   });
+
                   return res.json({ message: "User logged in successfully", status: "login", token });
               } else {
                   res.status(400).json({ error: 'Passwords do not match' });
               }
-          })
-          .catch((error) => {
+          }).catch((error) => {
             res.status(500).json({ error: 'Internal server error' });
           });
         });
 });
 
+app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { displayName, bio } = req.body;
+    const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
+
+    // Find the user by userId and update their profile
+    const user = await User.findByIdAndUpdate(userId, {
+      displayName,
+      bio,
+      profilePicture,
+    }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: user
+    });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Middleware for authenticating JWT token in socket connections
   socket.use((packet, next) => {
-    // Use socket.request.headers.cookie to access cookies
     const cookieHeader = socket.request.headers.cookie;
-    
     if (!cookieHeader) {
-      return next(new Error("Authentication error"));
-    }
-
-    // Manually parse the cookies (cookie-parser doesn't work here)
-    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
-      const [name, value] = cookie.trim().split('=');
-      acc[name] = value;
-      return acc;
-    }, {});
-
-    const token = cookies.jwt;  // Get jwt token from cookies
-
-    if (!token) {
-      return next(new Error("Authentication error"));
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
         return next(new Error("Authentication error"));
-      }
-      // Attach user info to the socket object
-      socket.userId = user.userId;
-      next();
+    }
+  
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+        const [name, value] = cookie.trim().split('=');
+        acc[name] = value;
+        return acc;
+    }, {});
+  
+    const token = cookies.jwt;
+    if (!token) {
+        return next(new Error("Authentication error"));
+    }
+  
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return next(new Error("Authentication error"));
+        }
+        socket.userId = user.userId;  // Attach user info
+        socket.userEmail = user.email; // Attach email as well (if needed)
+        next();
     });
   });
+  
 
   socket.on("join-room", async (roomId) => {
     socket.join(roomId);
     console.log(`User ${socket.id} joined room ${roomId}`);
-
+  
     try {
-      const messages = await Message.find({ roomId }).sort({ createdAt: -1 });
+      const messages = await Message.find({ roomId })
+        .populate("userId", "email")  // Populate only the email field
+        .sort({ createdAt: -1 });
+  
       socket.emit("previous-messages", messages.reverse());
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  });
+  });  
 
   socket.on("send-message", async (messageData) => {
-    const { roomId, message } = messageData;
-    const userId = socket.userId;  // Get userId from the socket (set by the JWT middleware)
+    const { roomId, message, userId, userEmail } = messageData;
   
-    if (!userId) {
-      console.error("Error: userId is missing");
+    if (!userId || !userEmail) {
+      console.error("Error: Missing userId or userEmail");
       return;
     }
   
     const newMessage = new Message({
       roomId,
       message,
-      userId,  // Use the userId from the JWT
+      userId,
+      userEmail, // Save email directly in message
     });
   
     try {
-      // Save the message to the database
       await newMessage.save();
-      console.log("Message saved successfully!");
+      console.log("Message saved with email!");
   
-      // Emit the new message to everyone in the room
+      // Server-side - Emitting to all clients in the room
       io.to(roomId).emit("receive-message", {
-        userId: socket.userId,
-        message: newMessage.message,
+        message: message,
+        userEmail: userEmail,
+        userId: userId
       });
+
     } catch (err) {
       console.error("Error saving message:", err);
     }
-  });  
-  
+  });
+    
 
   socket.on("disconnect", () => console.log("User disconnected"));
 });

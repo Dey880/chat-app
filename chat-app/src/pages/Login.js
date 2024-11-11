@@ -4,7 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "../css/Login.module.css";
 import Info from '../components/Info.js';
-import AboutButton from "../components/AboutButton.js"
+import AboutButton from "../components/AboutButton.js";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -16,28 +16,28 @@ export default function Login() {
         
         axios.post(
             `${process.env.REACT_APP_BACKEND_URL}/api/login`,
-            {
-                email: email,
-                password: password
-            },
-            {
-                withCredentials: true
-            }        
+            { email, password },
+            { withCredentials: true }  // This ensures the cookie is sent
         ).then((response) => {
-                if (response.data.status === "login") {
-                    const token = response.data.token;
-                    if (token) {
-                        const decoded = jwtDecode(token);
-                        navigate('/chat')
-                    } else {
-                        console.log("No token received.");
-                    }
+            if (response.data.status === "login") {
+                const token = response.data.token;
+                if (token) {
+                    // Decode the JWT token to get user data
+                    const decoded = jwtDecode(token);
+                    
+                    // Save the decoded user data to localStorage or Context
+                    console.log("Token received:", token);
+                    localStorage.setItem('user', JSON.stringify(decoded));
+                    navigate('/chat');
                 } else {
-                    console.log("Login failed:", response.data);
+                    console.log("No token received.");
                 }
-            }).catch((error) => {
-                console.log("Error:", error);
-            });
+            } else {
+                console.log("Login failed:", response.data);
+            }
+        }).catch((error) => {
+            console.log("Error:", error);
+        });
     };
 
     return (
