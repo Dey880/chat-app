@@ -51,8 +51,8 @@ app.use(express.json());
 const saltRounds = 10;
 
 app.get("/", (req, res) => {
-  res.send("hallo");
-});
+  res.send("You have successfully entered the server, type any command to get started")
+})
 
 app.get("/api/user", authenticateJWT, (req, res) => {
   User.findById(req.userId)
@@ -114,10 +114,9 @@ app.post("/api/login", (req, res) => {
                       { expiresIn: "1h" }
                   );
 
-                  // Set the JWT cookie
                   res.cookie("jwt", token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production', // set to true for HTTPS in production
+                    secure: process.env.NODE_ENV === 'production',
                     maxAge: 3600000,  // 1 hour
                     sameSite: "Lax",
                   });
@@ -138,7 +137,6 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
     const { displayName, bio } = req.body;
     const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Find the user by userId and update their profile
     const user = await User.findByIdAndUpdate(userId, {
       displayName,
       bio,
@@ -184,8 +182,8 @@ io.on("connection", (socket) => {
         if (err) {
             return next(new Error("Authentication error"));
         }
-        socket.userId = user.userId;  // Attach user info
-        socket.userEmail = user.email; // Attach email as well (if needed)
+        socket.userId = user.userId;
+        socket.userEmail = user.email;
         next();
     });
   });
@@ -197,7 +195,7 @@ io.on("connection", (socket) => {
   
     try {
       const messages = await Message.find({ roomId })
-        .populate("userId", "email")  // Populate only the email field
+        .populate("userId", "email")
         .sort({ createdAt: -1 });
   
       socket.emit("previous-messages", messages.reverse());
@@ -218,14 +216,12 @@ io.on("connection", (socket) => {
       roomId,
       message,
       userId,
-      userEmail, // Save email directly in message
+      userEmail,
     });
   
     try {
       await newMessage.save();
-      console.log("Message saved with email!");
   
-      // Server-side - Emitting to all clients in the room
       io.to(roomId).emit("receive-message", {
         message: message,
         userEmail: userEmail,
