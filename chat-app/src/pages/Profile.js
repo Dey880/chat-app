@@ -44,7 +44,11 @@ export default function Profile() {
 
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
-    setFile(uploadedFile);
+    if (uploadedFile && uploadedFile.type.startsWith('image/')) {
+      setFile(uploadedFile);
+    } else {
+      alert('Please upload a valid image file.');
+    }
   };
 
   const handleResetProfilePicture = () => {
@@ -68,8 +72,10 @@ export default function Profile() {
     e.preventDefault();
     setDragActive(false);
     const uploadedFile = e.dataTransfer.files[0];
-    if (uploadedFile) {
+    if (uploadedFile && uploadedFile.type.startsWith('image/')) {
       setFile(uploadedFile);
+    } else {
+      alert('Please drop a valid image file.');
     }
   };
 
@@ -138,6 +144,7 @@ export default function Profile() {
             onChange={handleFileChange}
             style={{ display: 'none' }}
             id="fileInput"
+            accept="image/*"
           />
           <p>{dragActive ? "Drop your image here" : "Drag and drop your image or click to upload"}</p>
           <button type="button" onClick={() => document.getElementById('fileInput').click()}>Choose File</button>
