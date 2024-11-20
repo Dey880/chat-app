@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", ],
     credentials: true,
   },
 });
@@ -40,13 +40,16 @@ mongoose.connect("mongodb://localhost:27017/chat-app")
 
 const corsOptions = {
   origin: "http://localhost:3000",
-  methods: "GET, POST",
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
 };
+
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+
+app.options("*", cors(corsOptions));
 
 const saltRounds = 10;
 
@@ -82,37 +85,38 @@ app.post("/api/user", (req, res) => {
                   process.env.JWT_SECRET,
                   { expiresIn: "1h" }
               );
+              console.log(token)
               res.cookie("jwt", token, {
-                  httpOnly: true,
-                  secure: false,
-                  maxAge: 3600000,
+                httpOnly: true,
+                secure: false,
+                maxAge: 3600000,
               });
               return res.status(201).json({ message: "User created successfully", status: "login" });
-          } catch (err) {
+            } catch (err) {
               return res.status(500).json({ error: 'Error saving user' });
-          }
+            }
+          });
+        } else {
+          res.status(400).json({ error: 'Passwords do not match' });
+        }
       });
-  } else {
-      res.status(400).json({ error: 'Passwords do not match' });
-  }
-});
-
-
-app.post("/api/login", (req, res) => {
-  const { email, password } = req.body;
-  User.findOne({ email: email })
-      .then((user) => {
+      
+      
+      app.post("/api/login", (req, res) => {
+        const { email, password } = req.body;
+        User.findOne({ email: email })
+        .then((user) => {
           if (!user) {
-              return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'User not found' });
           }
-
+          
           bcrypt.compare(password, user.password).then((result) => {
-              if (result) {
-                  const token = jwt.sign(
-                      { userId: user._id, email: user.email, role: user.role },
-                      process.env.JWT_SECRET,
-                      { expiresIn: "1h" }
-                  );
+            if (result) {
+              const token = jwt.sign(
+                { userId: user._id, email: user.email, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" }
+              );
 
                   res.cookie("jwt", token, {
                     httpOnly: true,
@@ -161,78 +165,61 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.use((packet, next) => {
-    const cookieHeader = socket.request.headers.cookie;
-    if (!cookieHeader) {
-        return next(new Error("Authentication error"));
-    }
-  
-    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
-        const [name, value] = cookie.trim().split('=');
-        acc[name] = value;
-        return acc;
-    }, {});
-  
-    const token = cookies.jwt;
-    if (!token) {
-        return next(new Error("Authentication error"));
-    }
-  
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            return next(new Error("Authentication error"));
-        }
-        socket.userId = user.userId;
-        socket.userEmail = user.email;
-        next();
-    });
-  });
-  
-
+  // Event listener for when a user joins a room
   socket.on("join-room", async (roomId) => {
     socket.join(roomId);
     console.log(`User ${socket.id} joined room ${roomId}`);
-  
+
     try {
+      // Fetch previous messages for the room
       const messages = await Message.find({ roomId })
-        .populate("userId", "email")
-        .sort({ createdAt: -1 });
-  
-      socket.emit("previous-messages", messages.reverse());
+        .populate("userId", "email displayName") // Populate the userId with email and displayName
+        .sort({ createdAt: -1 }); // Sort by creation date in descending order
+
+      console.log("Previous messages:", messages); // Log the previous messages
+      socket.emit("previous-messages", messages.reverse()); // Send the previous messages to the user
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  });  
+  });
 
+  // Event listener for sending a new message
   socket.on("send-message", async (messageData) => {
     const { roomId, message, userId, userEmail } = messageData;
-  
+
     if (!userId || !userEmail) {
       console.error("Error: Missing userId or userEmail");
       return;
     }
-  
+
+    // Retrieve the user's displayName from the User model
+    const user = await User.findById(userId);
+    const displayName = user ? user.displayName : userEmail; // Fallback to email if no displayName
+
     const newMessage = new Message({
       roomId,
       message,
       userId,
       userEmail,
+      displayName, // Set displayName from the user model
     });
-  
+
     try {
       await newMessage.save();
-  
+      console.log("Message saved:", newMessage); // Log the saved message
+
+      // Emit the message to all users in the room
       io.to(roomId).emit("receive-message", {
         message: message,
         userEmail: userEmail,
-        userId: userId
+        displayName: displayName,
+        userId: userId,
       });
 
     } catch (err) {
       console.error("Error saving message:", err);
     }
   });
-    
 
   socket.on("disconnect", () => console.log("User disconnected"));
 });

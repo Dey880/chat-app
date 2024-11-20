@@ -1,0 +1,19 @@
+.messages {
+    color: var(--yellow);
+    padding: 5px 10px;
+}
+.messageContainer {
+    overflow: auto;
+}
+
+strong {
+    color: var(--white);
+}
+
+.welcomeMessage {
+    color: var(--other-green);
+}
+
+input {
+    margin: 10px 0 0 0;
+}
