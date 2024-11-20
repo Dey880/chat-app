@@ -17,16 +17,13 @@ export default function Login() {
         axios.post(
             `${process.env.REACT_APP_BACKEND_URL}/api/login`,
             { email, password },
-            { withCredentials: true }  // This ensures the cookie is sent
+            { withCredentials: true }
         ).then((response) => {
             if (response.data.status === "login") {
                 const token = response.data.token;
                 if (token) {
-                    // Decode the JWT token to get user data
                     const decoded = jwtDecode(token);
                     
-                    // Save the decoded user data to localStorage or Context
-                    console.log("Token received:", token);
                     localStorage.setItem('user', JSON.stringify(decoded));
                     navigate('/chat');
                 } else {

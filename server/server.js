@@ -9,6 +9,8 @@ const { Server } = require("socket.io");
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const axios = require('axios');
 
 const app = express();
 const server = http.createServer(app); 
@@ -21,7 +23,7 @@ const io = new Server(server, {
 });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, './uploads/');
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -85,7 +87,6 @@ app.post("/api/user", (req, res) => {
                   process.env.JWT_SECRET,
                   { expiresIn: "1h" }
               );
-              console.log(token)
               res.cookie("jwt", token, {
                 httpOnly: true,
                 secure: false,
@@ -139,21 +140,51 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
   try {
     const userId = req.userId;
     const { displayName, bio } = req.body;
-    const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
+    const uploadedImage = req.file ? `/uploads/${req.file.filename}` : null;
 
-    const user = await User.findByIdAndUpdate(userId, {
-      displayName,
-      bio,
-      profilePicture,
-    }, { new: true });
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    let profilePicture;
+
+    if (user.profilePicture && user.profilePicture.startsWith('/uploads/')) {
+      const oldPath = path.join(__dirname, user.profilePicture);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
+
+    if (uploadedImage) {
+      profilePicture = uploadedImage;
+    } else {
+      const name = displayName || user.email;
+      const apiUrl = `https://api.nilskoepke.com/profile-image/?name=${name}`;
+      
+      const response = await axios.get(apiUrl, { responseType: 'stream' });
+      const svgFileName = `uploads/${Date.now()}-${name.replace(/\s/g, '_')}.svg`;
+      const writeStream = fs.createWriteStream(svgFileName);
+
+      await new Promise((resolve, reject) => {
+        response.data.pipe(writeStream);
+        writeStream.on('finish', resolve);
+        writeStream.on('error', reject);
+      });
+
+      profilePicture = `/${svgFileName}`;
+    }
+
+    user.displayName = displayName || user.displayName;
+    user.bio = bio || user.bio;
+    user.profilePicture = profilePicture;
+
+    const updatedUser = await user.save();
+
     res.json({
       message: 'Profile updated successfully',
-      user: user
+      user: updatedUser,
     });
   } catch (err) {
     console.error('Error updating profile:', err);
@@ -163,27 +194,21 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
 
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
 
-  // Event listener for when a user joins a room
   socket.on("join-room", async (roomId) => {
     socket.join(roomId);
-    console.log(`User ${socket.id} joined room ${roomId}`);
 
     try {
-      // Fetch previous messages for the room
       const messages = await Message.find({ roomId })
-        .populate("userId", "email displayName") // Populate the userId with email and displayName
-        .sort({ createdAt: -1 }); // Sort by creation date in descending order
+        .populate("userId", "email displayName")
+        .sort({ createdAt: -1 });
 
-      console.log("Previous messages:", messages); // Log the previous messages
-      socket.emit("previous-messages", messages.reverse()); // Send the previous messages to the user
+      socket.emit("previous-messages", messages.reverse());
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   });
 
-  // Event listener for sending a new message
   socket.on("send-message", async (messageData) => {
     const { roomId, message, userId, userEmail } = messageData;
 
@@ -192,23 +217,20 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // Retrieve the user's displayName from the User model
     const user = await User.findById(userId);
-    const displayName = user ? user.displayName : userEmail; // Fallback to email if no displayName
+    const displayName = user ? user.displayName : userEmail;
 
     const newMessage = new Message({
       roomId,
       message,
       userId,
       userEmail,
-      displayName, // Set displayName from the user model
+      displayName,
     });
 
     try {
       await newMessage.save();
-      console.log("Message saved:", newMessage); // Log the saved message
 
-      // Emit the message to all users in the room
       io.to(roomId).emit("receive-message", {
         message: message,
         userEmail: userEmail,
@@ -220,8 +242,6 @@ io.on("connection", (socket) => {
       console.error("Error saving message:", err);
     }
   });
-
-  socket.on("disconnect", () => console.log("User disconnected"));
 });
 
 server.listen(4000, () => {
