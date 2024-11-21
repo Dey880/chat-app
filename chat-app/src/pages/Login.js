@@ -13,29 +13,40 @@ export default function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+    
         axios.post(
             `${process.env.REACT_APP_BACKEND_URL}/api/login`,
             { email, password },
             { withCredentials: true }
-        ).then((response) => {
+        )
+        .then((response) => {
             if (response.data.status === "login") {
                 const token = response.data.token;
                 if (token) {
                     const decoded = jwtDecode(token);
-                    
                     localStorage.setItem('user', JSON.stringify(decoded));
                     navigate('/chat');
                 } else {
-                    console.log("No token received.");
+                    alert("No token received. Please try again.");
                 }
             } else {
-                console.log("Login failed:", response.data);
+                alert("Login failed. Please check your credentials.");
             }
-        }).catch((error) => {
-            console.log("Error:", error);
+        })
+        .catch((error) => {
+            if (error.response) {
+                // Server responded with a status code outside of the 2xx range
+                alert(error.response.data.error || "An error occurred during login.");
+            } else if (error.request) {
+                // Request was made but no response received
+                alert("No response from server. Please try again later.");
+            } else {
+                // Something went wrong setting up the request
+                alert("An unexpected error occurred.");
+            }
+            console.error("Login error:", error);
         });
-    };
+    };    
 
     return (
         <>
