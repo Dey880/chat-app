@@ -68,16 +68,32 @@ export default function Profile() {
     setDragActive(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     setDragActive(false);
-    const uploadedFile = e.dataTransfer.files[0];
-    if (uploadedFile && uploadedFile.type.startsWith('image/')) {
-      setFile(uploadedFile);
+  
+    const url = e.dataTransfer.getData('text/plain');
+  
+    if (url) {
+      try {
+        const proxyUrl = `http://localhost:4000/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch the image from the proxy');
+        }
+  
+        const svgBlob = await response.blob();
+        const file = new File([svgBlob], `profile-picture.svg`, { type: 'image/svg+xml' });
+        setFile(file);
+      } catch (error) {
+        console.error('Error processing dropped SVG:', error);
+        alert('Failed to process the dropped image.');
+      }
     } else {
-      alert('Please drop a valid image file.');
+      alert('Please drop a valid image URL.');
     }
-  };
+  };  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -148,6 +164,7 @@ export default function Profile() {
           />
           <p>{dragActive ? "Drop your image here" : "Drag and drop your image or click to upload"}</p>
           <button type="button" onClick={() => document.getElementById('fileInput').click()}>Choose File</button>
+          <p>Drag the pre generated profile picture into the drop area to select it</p>
           {displayPicture && (
             <div>
               <img
@@ -155,7 +172,7 @@ export default function Profile() {
                 src={displayPicture}
                 alt="Profile"
               />
-              <button type="button" onClick={handleResetProfilePicture}>Reset to Default</button>
+              <button type="button" onClick={handleResetProfilePicture}>Reset to Default / Generate profile picture</button>
             </div>
           )}
         </div>

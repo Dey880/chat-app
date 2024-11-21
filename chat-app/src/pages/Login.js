@@ -35,13 +35,10 @@ export default function Login() {
         })
         .catch((error) => {
             if (error.response) {
-                // Server responded with a status code outside of the 2xx range
                 alert(error.response.data.error || "An error occurred during login.");
             } else if (error.request) {
-                // Request was made but no response received
                 alert("No response from server. Please try again later.");
             } else {
-                // Something went wrong setting up the request
                 alert("An unexpected error occurred.");
             }
             console.error("Login error:", error);

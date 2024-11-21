@@ -59,6 +59,8 @@ app.get("/", (req, res) => {
   res.send("You have successfully entered the server, type any command to get started")
 })
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.get("/api/user", authenticateJWT, (req, res) => {
   User.findById(req.userId)
   .then(user => {
@@ -70,6 +72,23 @@ app.get("/api/user", authenticateJWT, (req, res) => {
         .catch(err => {
             res.status(500).json({ error: "Internal server error" });
         });
+});
+
+app.get('/api/proxy-profile-image', async (req, res) => {
+  const { url } = req.query;
+
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required' });
+  }
+
+  try {
+    const response = await axios.get(url, { responseType: 'stream' });
+    res.setHeader('Content-Type', 'image/svg+xml');
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Error proxying the request:', error);
+    res.status(500).json({ error: 'Failed to fetch the image' });
+  }
 });
 
 app.post("/api/user", (req, res) => {
@@ -194,50 +213,54 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
 
 
 io.on("connection", (socket) => {
-
   socket.on("join-room", async (roomId) => {
     socket.join(roomId);
-
+  
     try {
       const messages = await Message.find({ roomId })
-        .populate("userId", "email displayName")
+        .populate("userId", "displayName profilePicture")
         .sort({ createdAt: -1 });
-
-      socket.emit("previous-messages", messages.reverse());
+  
+      const formattedMessages = messages.map((msg) => ({
+        message: msg.message,
+        displayName: msg.userId.displayName,
+        profilePicture: msg.userId.profilePicture,
+        createdAt: msg.createdAt,
+      }));
+  
+      socket.emit("previous-messages", formattedMessages.reverse());
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   });
+  
 
   socket.on("send-message", async (messageData) => {
-    const { roomId, message, userId, userEmail } = messageData;
+    const { roomId, message, userId } = messageData;
 
-    if (!userId || !userEmail) {
-      console.error("Error: Missing userId or userEmail");
+    if (!userId) {
+      console.error("Error: Missing userId");
       return;
     }
-
-    const user = await User.findById(userId);
-    const displayName = user ? user.displayName : userEmail;
 
     const newMessage = new Message({
       roomId,
       message,
       userId,
-      userEmail,
-      displayName,
     });
 
     try {
-      await newMessage.save();
+      const savedMessage = await newMessage.save();
+
+      const populatedMessage = await savedMessage.populate("userId", "displayName profilePicture email");
 
       io.to(roomId).emit("receive-message", {
-        message: message,
-        userEmail: userEmail,
-        displayName: displayName,
-        userId: userId,
+        message: populatedMessage.message,
+        displayName: populatedMessage.userId.displayName,
+        profilePicture: populatedMessage.userId.profilePicture,
+        userEmail: populatedMessage.userId.email,
+        userId: populatedMessage.userId._id,
       });
-
     } catch (err) {
       console.error("Error saving message:", err);
     }

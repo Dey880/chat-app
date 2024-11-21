@@ -14,10 +14,10 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
     });
 
     socket.on("receive-message", (message) => {
-      console.log("Received message:", message); // Add a log here
+      console.log("Received message:", message);
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, message];
-        console.log("Updated messages:", updatedMessages); // Log the updated messages
+        console.log("Updated messages:", updatedMessages);
         return updatedMessages;
       });
       });
@@ -70,6 +70,11 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
         <h1 className={styles.welcomeMessage}>You are now connected to {roomName}</h1>
         {messages.map((msg, index) => (
           <div key={index} className={styles.messages}>
+            <img 
+              src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`} 
+              alt={msg.displayName || msg.userEmail} 
+              className={styles.profilePicture} 
+            />
             <strong>{msg.displayName || msg.userEmail}</strong>: {msg.message}
           </div>
         ))}
