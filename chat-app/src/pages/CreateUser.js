@@ -17,7 +17,7 @@ export default function CreateUser() {
         e.preventDefault();
 
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/user`,
+            `http://localhost:4000/api/user`,
             {
                 email: email,
                 password: password,

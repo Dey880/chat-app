@@ -15,7 +15,7 @@ export default function Login() {
         e.preventDefault();
 
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+            "http://localhost:4000/api/login",
             { email, password },
             { withCredentials: true }
         )

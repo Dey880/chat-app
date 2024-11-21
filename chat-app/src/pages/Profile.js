@@ -18,10 +18,17 @@ export default function Profile() {
   const b = Math.floor(Math.random() * 256);
   const color = `$${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 
-  const pfpApi = (name) => `https://api.nilskoepke.com/profile-image/?name=${name}&backgroundColor=${color}`;
+  const sanitizeFileName = (name) => {
+    return name.replace(/[^a-zA-Z0-9_-]/g, '_');
+  };
+
+  const pfpApi = (name) => {
+    const sanitizedDisplayName = sanitizeFileName(name);
+    return `https://api.nilskoepke.com/profile-image/?name=${sanitizedDisplayName}&backgroundColor=${color}`;
+  };
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users`, { withCredentials: true })
+    axios.get("http://localhost:4000/api/user", { withCredentials: true })
       .then((response) => {
         const { displayName, bio, profilePicture } = response.data;
         const profilePfp = profilePicture || pfpApi(displayName || response.data.email);
@@ -34,8 +41,7 @@ export default function Profile() {
       .catch((error) => {
         console.error('Error fetching user info:', error);
       });
-  }, []);
-
+  }, []);  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,7 +82,7 @@ export default function Profile() {
 
     if (url) {
       try {
-        const proxyUrl = `${process.env.REACT_APP_BACKEND_URL}/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
+        const proxyUrl = `http://localhost:4000/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
         const response = await fetch(proxyUrl);
 
         if (!response.ok) {
@@ -107,7 +113,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/user`, formData, {
+      const response = await axios.put("http://localhost:4000/api/user", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -164,7 +170,7 @@ export default function Profile() {
           />
           <p>{dragActive ? "Drop your image here" : "Drag and drop your image or click to upload"}</p>
           <button type="button" onClick={() => document.getElementById('fileInput').click()}>Choose File</button>
-          <p>Drag the pre generated profile picture into the drop area to select it</p>
+          <p>Drag the pre-generated profile picture into the drop area to select it</p>
           {displayPicture && (
             <div>
               <img
@@ -172,9 +178,9 @@ export default function Profile() {
                 src={displayPicture}
                 alt="Profile"
               />
-              <button type="button" onClick={handleResetProfilePicture}>Reset to Default / Generate profile picture</button>
             </div>
           )}
+          <button type="button" onClick={handleResetProfilePicture}>Reset to Default / Generate profile picture</button>
         </div>
         <button type="submit">Save Changes</button>
       </form>
