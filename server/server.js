@@ -218,7 +218,7 @@ io.on("connection", (socket) => {
   
     try {
       const messages = await Message.find({ roomId })
-        .populate("userId", "displayName profilePicture")
+        .populate("userId", "displayName profilePicture role")
         .sort({ createdAt: -1 });
   
       const formattedMessages = messages.map((msg) => ({
@@ -226,9 +226,11 @@ io.on("connection", (socket) => {
         displayName: msg.userId.displayName,
         profilePicture: msg.userId.profilePicture,
         createdAt: msg.createdAt,
+        role: msg.userId.role,
       }));
-  
+      
       socket.emit("previous-messages", formattedMessages.reverse());
+        
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -237,34 +239,35 @@ io.on("connection", (socket) => {
 
   socket.on("send-message", async (messageData) => {
     const { roomId, message, userId } = messageData;
-
+  
     if (!userId) {
       console.error("Error: Missing userId");
       return;
     }
-
+  
     const newMessage = new Message({
       roomId,
       message,
       userId,
     });
-
+  
     try {
       const savedMessage = await newMessage.save();
-
-      const populatedMessage = await savedMessage.populate("userId", "displayName profilePicture email");
-
+  
+      const populatedMessage = await savedMessage.populate("userId", "displayName profilePicture email role");
+  
       io.to(roomId).emit("receive-message", {
         message: populatedMessage.message,
         displayName: populatedMessage.userId.displayName,
         profilePicture: populatedMessage.userId.profilePicture,
         userEmail: populatedMessage.userId.email,
         userId: populatedMessage.userId._id,
+        role: populatedMessage.userId.role,
       });
     } catch (err) {
       console.error("Error saving message:", err);
     }
-  });
+  });  
 });
 
 app.use((req, res, next) => {

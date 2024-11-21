@@ -25,3 +25,23 @@ input {
     margin-right: 10px;
     vertical-align: middle;
 }
+
+.admin {
+    font-size: 0.9em;
+    color: #ff2853;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.user {
+    font-size: 0.9em;
+    color: #df8a45;
+    margin-left: 5px;
+    font-weight: light;
+}
+
+.moderator {
+    font-size: 0.9em;
+    color: 	#00d062;
+    margin-left: 5px;
+}

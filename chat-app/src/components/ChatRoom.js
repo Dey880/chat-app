@@ -8,25 +8,26 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
 
   useEffect(() => {
     socket.emit("join-room", roomId);
-
+  
     socket.on("previous-messages", (previousMessages) => {
-      setMessages(previousMessages);
+      setMessages(previousMessages.map((msg) => ({
+        ...msg,
+        role: msg.role || "role",
+      })));
     });
-
+  
     socket.on("receive-message", (message) => {
-      console.log("Received message:", message);
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, message];
-        console.log("Updated messages:", updatedMessages);
         return updatedMessages;
       });
-      });
-
+    });
+  
     return () => {
       socket.off("receive-message");
       socket.off("previous-messages");
     };
-  }, [roomId, socket]);
+  }, [roomId, socket]);  
   
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,8 +52,9 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
       userId,
       userEmail,
       displayName,
+      role: userData.role,
     };
-  
+    
     socket.emit("send-message", messageData);
     setNewMessage("");
   };
@@ -65,6 +67,7 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
   };
 
   return (
+    <>
     <div className={className}>
       <div className={styles.messageContainer}>
         <h1 className={styles.welcomeMessage}>You are now connected to {roomName}</h1>
@@ -74,11 +77,18 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
               src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`} 
               alt={msg.displayName || msg.userEmail} 
               className={styles.profilePicture} 
-            />
-            <strong>{msg.displayName || msg.userEmail}</strong>: {msg.message}
+              />
+            <strong>{msg.displayName || msg.userEmail}</strong> 
+            {msg.role && (
+              <span
+                className={msg.role === "admin" ? styles.admin : msg.role === "moderator" ? styles.moderator : styles.user}
+              >
+                [{msg.role}]
+              </span>
+            )}
+            : {msg.message}
           </div>
         ))}
-        {}
         <div ref={messageEndRef} />
       </div>
       <div>
@@ -87,9 +97,10 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message:"
-        />
+          />
         <button onClick={sendMessage}>Send</button>
       </div>
     </div>
+    </>
   );
 }
