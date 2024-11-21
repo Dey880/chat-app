@@ -21,7 +21,7 @@ export default function Profile() {
   const pfpApi = (name) => `https://api.nilskoepke.com/profile-image/?name=${name}&backgroundColor=${color}`;
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/user', { withCredentials: true })
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users`, { withCredentials: true })
       .then((response) => {
         const { displayName, bio, profilePicture } = response.data;
         const profilePfp = profilePicture || pfpApi(displayName || response.data.email);
@@ -76,7 +76,7 @@ export default function Profile() {
 
     if (url) {
       try {
-        const proxyUrl = `http://localhost:4000/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
+        const proxyUrl = `${process.env.REACT_APP_BACKEND_URL}/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
         const response = await fetch(proxyUrl);
 
         if (!response.ok) {
@@ -107,7 +107,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await axios.put('http://localhost:4000/api/user', formData, {
+      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/user`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

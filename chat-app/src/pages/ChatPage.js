@@ -6,7 +6,7 @@ import styles from '../css/ChatPage.module.css'
 
 
 
-const socket = io("http://localhost:4000", {
+const socket = io(`${process.env.REACT_APP_BACKEND_URL}`, {
   withCredentials: true,
 });
 
