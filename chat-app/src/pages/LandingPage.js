@@ -12,12 +12,12 @@ export default function LandingPage() {
             <hr className={styles.LandingPageHr}/>
             <h1 className={`${styles.chattern} ${styles.LandingPageH1}`}>CHATTER’N</h1>
             <a href='/login' className={styles.loginA}>
-                <button className={styles.loginButton}> 
+                <button className={styles.loginButton}>
                     Login
                 </button>
             </a>
             <a href='/createuser' className={styles.signupA}>
-                <button className={styles.signupButton}> 
+                <button className={styles.signupButton}>
                     Signup
                 </button>
             </a>

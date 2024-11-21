@@ -5,13 +5,13 @@ export default function About() {
     return (
     <>
     <div className={styles.aboutParent}>
-        <div className={styles.aboutDiv1}> 
+        <div className={styles.aboutDiv1}>
             <h1 className={styles.welcome}>Welcome To</h1>
         </div>
-        <div className={styles.aboutDiv2}> 
+        <div className={styles.aboutDiv2}>
             <h1 className={styles.info}>Info About</h1>
         </div>
-        <div className={styles.aboutDiv3}> 
+        <div className={styles.aboutDiv3}>
             <div className={styles.aboutInfoContainer}>
                 <div className={styles.aboutInfoHeader}>
                     <div className={styles.aboutInfoImageContainer}>
@@ -29,15 +29,15 @@ making it look like readable English. Many desktop publishing packages and web p
             </div>
 
         </div>
-        <div className={styles.aboutDiv4}> 
+        <div className={styles.aboutDiv4}>
             <h1 className={styles.aboutH1}>CHATTER’N</h1>
             <a href='/login' className={styles.loginA}>
-                <button className={styles.loginButton}> 
+                <button className={styles.loginButton}>
                     Login
                 </button>
             </a>
             <a href='/createuser' className={styles.signupA}>
-                <button className={styles.signupButton}> 
+                <button className={styles.signupButton}>
                     Signup
                 </button>
             </a>

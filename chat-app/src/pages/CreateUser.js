@@ -15,12 +15,12 @@ export default function CreateUser() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/user`, 
+            `${process.env.REACT_APP_BACKEND_URL}/api/user`,
             {
-                email: email, 
-                password: password, 
+                email: email,
+                password: password,
                 repeatPassword: repeatPassword,
                 role: role
             }
@@ -33,7 +33,7 @@ export default function CreateUser() {
         }).catch((error) => {
             console.log("Error during registration:", error);
         });
-        
+
     }
 
     return (
@@ -52,7 +52,7 @@ export default function CreateUser() {
                 <input className={`${styles.createUserLoginEmail} ${styles.createUserLoginInput}`} type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
                 <input className={`${styles.createUserLoginPassword} ${styles.createUserLoginInput}`} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
                 <input className={`${styles.createUserLoginRepeatPassword} ${styles.createUserLoginInput}`} type='password' placeholder='Repeat password' onChange={(e) => setRepeatPassword(e.target.value)} />
-                
+
                 <div className={styles.createUserRadioInput}>
                     <label>
                         <input type="radio" id="user" name="role-radio" value="user" checked={role === "user"} onChange={() => setRole("user")} />

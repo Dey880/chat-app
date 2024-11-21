@@ -8,27 +8,27 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
 
   useEffect(() => {
     socket.emit("join-room", roomId);
-  
+
     socket.on("previous-messages", (previousMessages) => {
       setMessages(previousMessages.map((msg) => ({
         ...msg,
         role: msg.role || "role",
       })));
     });
-  
+
     socket.on("receive-message", (message) => {
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, message];
         return updatedMessages;
       });
     });
-  
+
     return () => {
       socket.off("receive-message");
       socket.off("previous-messages");
     };
-  }, [roomId, socket]);  
-  
+  }, [roomId, socket]);
+
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -38,14 +38,14 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
       console.error("User is not authenticated properly");
       return;
     }
-  
+
     if (newMessage.trim() === "") {
       return;
     }
-  
+
     const userData = JSON.parse(localStorage.getItem("user"));
     const displayName = userData.displayName || userData.email;
-  
+
     const messageData = {
       roomId,
       message: newMessage,
@@ -54,11 +54,11 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
       displayName,
       role: userData.role,
     };
-    
+
     socket.emit("send-message", messageData);
     setNewMessage("");
   };
-  
+
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -73,12 +73,12 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
         <h1 className={styles.welcomeMessage}>You are now connected to {roomName}</h1>
         {messages.map((msg, index) => (
           <div key={index} className={styles.messages}>
-            <img 
-              src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`} 
-              alt={msg.displayName || msg.userEmail} 
-              className={styles.profilePicture} 
+            <img
+              src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`}
+              alt={msg.displayName || msg.userEmail}
+              className={styles.profilePicture}
               />
-            <strong>{msg.displayName || msg.userEmail}</strong> 
+            <strong>{msg.displayName || msg.userEmail}</strong>
             {msg.role && (
               <span
                 className={msg.role === "admin" ? styles.admin : msg.role === "moderator" ? styles.moderator : styles.user}

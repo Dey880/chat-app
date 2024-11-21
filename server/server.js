@@ -13,7 +13,7 @@ const fs = require('fs');
 const axios = require('axios');
 
 const app = express();
-const server = http.createServer(app); 
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -120,8 +120,8 @@ app.post("/api/user", (req, res) => {
           res.status(400).json({ error: 'Passwords do not match' });
         }
       });
-      
-      
+
+
       app.post("/api/login", (req, res) => {
         const { email, password } = req.body;
         User.findOne({ email: email })
@@ -129,7 +129,7 @@ app.post("/api/user", (req, res) => {
           if (!user) {
             return res.status(404).json({ error: 'User not found' });
           }
-          
+
           bcrypt.compare(password, user.password).then((result) => {
             if (result) {
               const token = jwt.sign(
@@ -181,7 +181,7 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
     } else {
       const name = displayName || user.email;
       const apiUrl = `https://api.nilskoepke.com/profile-image/?name=${name}`;
-      
+
       const response = await axios.get(apiUrl, { responseType: 'stream' });
       const svgFileName = `uploads/${Date.now()}-${name.replace(/\s/g, '_')}.svg`;
       const writeStream = fs.createWriteStream(svgFileName);
@@ -215,12 +215,12 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
 io.on("connection", (socket) => {
   socket.on("join-room", async (roomId) => {
     socket.join(roomId);
-  
+
     try {
       const messages = await Message.find({ roomId })
         .populate("userId", "displayName profilePicture role")
         .sort({ createdAt: -1 });
-  
+
       const formattedMessages = messages.map((msg) => ({
         message: msg.message,
         displayName: msg.userId.displayName,
@@ -228,34 +228,34 @@ io.on("connection", (socket) => {
         createdAt: msg.createdAt,
         role: msg.userId.role,
       }));
-      
+
       socket.emit("previous-messages", formattedMessages.reverse());
-        
+
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   });
-  
+
 
   socket.on("send-message", async (messageData) => {
     const { roomId, message, userId } = messageData;
-  
+
     if (!userId) {
       console.error("Error: Missing userId");
       return;
     }
-  
+
     const newMessage = new Message({
       roomId,
       message,
       userId,
     });
-  
+
     try {
       const savedMessage = await newMessage.save();
-  
+
       const populatedMessage = await savedMessage.populate("userId", "displayName profilePicture email role");
-  
+
       io.to(roomId).emit("receive-message", {
         message: populatedMessage.message,
         displayName: populatedMessage.userId.displayName,
@@ -267,7 +267,7 @@ io.on("connection", (socket) => {
     } catch (err) {
       console.error("Error saving message:", err);
     }
-  });  
+  });
 });
 
 app.use((req, res, next) => {

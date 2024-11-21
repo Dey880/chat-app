@@ -9,11 +9,11 @@ import AboutButton from "../components/AboutButton.js";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         axios.post(
             `${process.env.REACT_APP_BACKEND_URL}/api/login`,
             { email, password },
@@ -43,7 +43,7 @@ export default function Login() {
             }
             console.error("Login error:", error);
         });
-    };    
+    };
 
     return (
         <>
@@ -56,7 +56,7 @@ export default function Login() {
         <hr className={styles.loginHr}/>
         <h1 className={styles.loginText}>Login</h1>
         <div className={styles.loginFormContainer}>
-            <form onSubmit={handleSubmit} className={styles.loginForm}> 
+            <form onSubmit={handleSubmit} className={styles.loginForm}>
                 <input className={`${styles.loginEmail} ${styles.loginInput}`} type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
                 <input className={`${styles.loginPassword} ${styles.loginInput}`} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
                 <button className={`${styles.loginSubmit} ${styles.loginInput}`} type="submit">Login</button>

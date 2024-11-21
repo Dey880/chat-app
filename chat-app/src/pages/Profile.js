@@ -11,13 +11,13 @@ export default function Profile() {
   });
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(Math.random() * 256);
   const b = Math.floor(Math.random() * 256);
   const color = `$${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  
+
   const pfpApi = (name) => `https://api.nilskoepke.com/profile-image/?name=${name}&backgroundColor=${color}`;
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function Profile() {
         console.error('Error fetching user info:', error);
       });
   }, []);
-  
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,18 +71,18 @@ export default function Profile() {
   const handleDrop = async (e) => {
     e.preventDefault();
     setDragActive(false);
-  
+
     const url = e.dataTransfer.getData('text/plain');
-  
+
     if (url) {
       try {
         const proxyUrl = `http://localhost:4000/api/proxy-profile-image?url=${encodeURIComponent(url)}`;
         const response = await fetch(proxyUrl);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch the image from the proxy');
         }
-  
+
         const svgBlob = await response.blob();
         const file = new File([svgBlob], `profile-picture.svg`, { type: 'image/svg+xml' });
         setFile(file);
@@ -93,19 +93,19 @@ export default function Profile() {
     } else {
       alert('Please drop a valid image URL.');
     }
-  };  
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     formData.append('displayName', userInfo.displayName);
     formData.append('bio', userInfo.bio);
-  
+
     if (file) {
       formData.append('profilePicture', file);
     }
-  
+
     try {
       const response = await axios.put('http://localhost:4000/api/user', formData, {
         headers: {
@@ -114,7 +114,7 @@ export default function Profile() {
         withCredentials: true,
       });
       navigate('/chat');
-      
+
     } catch (error) {
       console.error('Error updating profile:', error);
     }
