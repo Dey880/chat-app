@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../css/ChatRoom.module.css";
 
 export default function ChatRoom({ className, roomId, roomName, socket, userId, userEmail }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messageEndRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.emit("join-room", roomId);
@@ -66,6 +68,10 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
     }
   };
 
+  const navigateProfile = () => {
+    navigate('/profile');
+  }
+
   return (
     <>
     <div className={className}>
@@ -74,6 +80,7 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
         {messages.map((msg, index) => (
           <div key={index} className={styles.messages}>
             <img
+              onClick={navigateProfile}
               src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`}
               alt={msg.displayName || msg.userEmail}
               className={styles.profilePicture}
@@ -93,12 +100,13 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
       </div>
       <div>
         <input
+          className={styles.messageField}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message:"
           />
-        <button onClick={sendMessage}>Send</button>
+        <button className={styles.sendButton} onClick={sendMessage}>Send</button>
       </div>
     </div>
     </>

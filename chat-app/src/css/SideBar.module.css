@@ -1,0 +1,19 @@
+.sidebar {
+    height: 100vh;
+    color: var(--yellow);
+    background-color: var(--dark);
+    border-right: 1px solid var(--yellow);
+    padding: 0 0 0 20px;
+    width: 75%;
+}
+
+ul {
+    list-style-type: none;
+    width: max-content;
+}
+
+li {
+    margin: 0 0 5px 0;
+    cursor: pointer;
+    width: max-content;
+}

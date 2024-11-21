@@ -24,6 +24,7 @@ input {
     border-radius: 50%;
     margin-right: 10px;
     vertical-align: middle;
+    cursor: pointer;
 }
 
 .admin {
@@ -44,4 +45,21 @@ input {
     font-size: 0.9em;
     color: 	#00d062;
     margin-left: 5px;
+}
+
+.messageField {
+    background-color: var(--dark);
+    border: solid 2px var(--black);
+    padding: 5px 0 5px 10px;
+    width: 50%;
+    border-radius: 10px 0 0 10px;
+}
+
+.sendButton {
+    color: white;
+    background-color: var(--dark);
+    border: solid 2px var(--black);
+    padding: 5px;
+    border-radius: 0 10px 10px 0;
+    margin: 0 0 10px 0;
 }
