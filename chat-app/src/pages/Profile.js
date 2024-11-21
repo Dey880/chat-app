@@ -19,9 +19,9 @@ export default function Profile() {
   const color = `$${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 
   const sanitizeFileName = (name) => {
-    return name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    return name.replace(/[^a-zA-Z0-9 _\-:;.,|]/g, '_');
   };
-
+  
   const pfpApi = (name) => {
     const sanitizedDisplayName = sanitizeFileName(name);
     return `https://api.nilskoepke.com/profile-image/?name=${sanitizedDisplayName}&backgroundColor=${color}`;
