@@ -1,7 +1,9 @@
 .messages {
     color: var(--yellow);
     padding: 5px 10px;
+    display: flex;
 }
+
 .messageContainer {
     overflow: auto;
 }
@@ -14,17 +16,15 @@ strong {
     color: var(--other-green);
 }
 
-input {
-    margin: 10px 0 0 0;
-}
-
 .profilePicture {
+    position: relative;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
     vertical-align: middle;
     cursor: pointer;
+    top: -7px;
 }
 
 .admin {
@@ -43,23 +43,32 @@ input {
 
 .moderator {
     font-size: 0.9em;
-    color: 	#00d062;
+    color: #00d062;
     margin-left: 5px;
 }
 
 .messageField {
+    color: var(--yellow);
     background-color: var(--dark);
-    border: solid 2px var(--black);
+    border: none;
     padding: 5px 0 5px 10px;
-    width: 50%;
-    border-radius: 10px 0 0 10px;
+    width: 75%;
+    border-radius: 10px;
+    margin: 10px 2px;
 }
 
-.sendButton {
-    color: white;
-    background-color: var(--dark);
-    border: solid 2px var(--black);
-    padding: 5px;
-    border-radius: 0 10px 10px 0;
-    margin: 0 0 10px 0;
+.messageField::placeholder {
+    color: var(--yellow);
+}
+
+.messageField:focus {
+    outline: solid 2px var(--white);
+}
+
+.name {
+    text-wrap: nowrap;
+}
+
+.msgSpan {
+    width: 65%;
 }

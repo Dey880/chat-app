@@ -1,3 +1,11 @@
+.parent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
 .apiImg{
     width: 100px;
     margin: 20px 0 20px 0;
@@ -13,4 +21,80 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+h1, label, .input, textarea{
+    color: var(--yellow);
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-wrap: wrap;
+    width: fit-content;
+    color: white;
+    height: fit-content;
+    background: var(--grey);
+    border-radius: 14px;
+    border: solid 3px var(--yellow);
+}
+
+.bg {
+    position: absolute;
+    z-index: -1;
+    inset: -4px;
+    border-radius: 16px;
+    overflow: hidden;
+    }
+
+.uwu {
+    filter: blur(8px);
+    transition: filter 0.3s;
+}
+
+.content {
+    position: relative;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.img {
+    height: 5em;
+    width: 5em;
+    margin: auto;
+    background-color: #fff3;
+    border-radius: 1em;
+}
+
+.img .svg {
+    height: 100%;
+    fill: white;
+}
+
+.content div {
+    text-align: center;
+}
+
+.h1 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.p {
+    font-size: 0.75em;
+}
+
+.textarea {
+    min-width: 75%;
+    max-width: 75%;
+    margin-top: 0.5em;
+    padding: 0.5em;
+    background-color: #0003;
+    border-radius: 1em;
 }

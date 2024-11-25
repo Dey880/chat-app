@@ -61,6 +61,7 @@ app.get("/", (req, res) => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 app.get("/api/user", authenticateJWT, (req, res) => {
   User.findById(req.userId)
   .then(user => {
@@ -138,12 +139,12 @@ app.post("/api/user", (req, res) => {
                 { expiresIn: "1h" }
               );
 
-                  res.cookie("jwt", token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    maxAge: 3600000,  // 1 hour
-                    sameSite: "Lax",
-                  });
+                res.cookie("jwt", token, {
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === 'production',
+                  maxAge: 604800000,  // 7 days
+                  sameSite: "Lax",
+                });
 
                   return res.json({ message: "User logged in successfully", status: "login", token });
               } else {
@@ -167,18 +168,17 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
       return res.status(404).json({ error: 'User not found' });
     }
 
-    let profilePicture;
-
-    if (user.profilePicture && user.profilePicture.startsWith('/uploads/')) {
-      const oldPath = path.join(__dirname, user.profilePicture);
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
-    }
+    let profilePicture = user.profilePicture;
 
     if (uploadedImage) {
+      if (user.profilePicture && user.profilePicture.startsWith('/uploads/')) {
+        const oldPath = path.join(__dirname, user.profilePicture);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
       profilePicture = uploadedImage;
-    } else {
+    } else if (!user.profilePicture || !user.profilePicture.startsWith('/uploads/')) {
       const name = displayName || user.email;
       const apiUrl = `https://api.nilskoepke.com/profile-image/?name=${name}`;
 
@@ -210,7 +210,6 @@ app.put('/api/user', authenticateJWT, upload.single('profilePicture'), async (re
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 io.on("connection", (socket) => {
   socket.on("join-room", async (roomId) => {

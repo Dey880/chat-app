@@ -85,7 +85,9 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
               alt={msg.displayName || msg.userEmail}
               className={styles.profilePicture}
               />
-            <strong>{msg.displayName || msg.userEmail}</strong>
+            <strong
+            className={styles.name}
+            >{msg.displayName || msg.userEmail}</strong>
             {msg.role && (
               <span
                 className={msg.role === "admin" ? styles.admin : msg.role === "moderator" ? styles.moderator : styles.user}
@@ -93,21 +95,23 @@ export default function ChatRoom({ className, roomId, roomName, socket, userId, 
                 [{msg.role}]
               </span>
             )}
-            : {msg.message}
+            :&nbsp;&nbsp;
+            <span
+            className={styles.msgSpan}
+            >
+              {msg.message}
+              </span>
           </div>
         ))}
         <div ref={messageEndRef} />
       </div>
-      <div>
-        <input
-          className={styles.messageField}
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Message:"
-          />
-        <button className={styles.sendButton} onClick={sendMessage}>Send</button>
-      </div>
+      <input
+        className={styles.messageField}
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Message:"
+        />
     </div>
     </>
   );

@@ -45,7 +45,7 @@ return (
         displayName={displayName}
       />
     ) : (
-      <div>Select a room to start chatting!</div>
+      <div className={styles.placeHolder}>Select a room to start chatting!</div>
     )}
   </div>
 );

@@ -40,6 +40,7 @@ export default function Profile() {
       })
       .catch((error) => {
         console.error('Error fetching user info:', error);
+        alert('Error fetching user info, try logging in again!', error)
       });
   }, []);  
 
@@ -127,50 +128,52 @@ export default function Profile() {
   };
 
   const displayPicture = file
-    ? URL.createObjectURL(file)
+  ? URL.createObjectURL(file)
+  : userInfo.profilePicture.startsWith('/uploads/')
+    ? `http://localhost:4000${userInfo.profilePicture}`
     : userInfo.profilePicture;
 
   return (
-    <div>
-      <h1>Edit Profile</h1>
+    <div className={styles.parent}>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Display Name:</label>
-          <input
-            type="text"
-            name="displayName"
-            value={userInfo.displayName}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label>Bio:</label>
-          <textarea
-            name="bio"
-            value={userInfo.bio}
-            onChange={handleInputChange}
-          />
-        </div>
+      <div className={styles.card}>
+        <h1>Edit Profile</h1>
+        <div className={`${styles.bg} ${styles.uwu}`}></div>
+        <div className={styles.bg}></div>
+        <div className={styles.content}>
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={styles.dropArea}
           style={{
-            border: dragActive ? '2px dashed #000' : '2px solid #ccc'
+            border: dragActive ? "2px dashed #000" : "2px solid #ccc",
           }}
         >
           <label>Profile Picture:</label>
           <input
+            className={`${styles.input}`}
             type="file"
             onChange={handleFileChange}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             id="fileInput"
             accept="image/*"
           />
-          <p>{dragActive ? "Drop your image here" : "Drag and drop your image or click to upload"}</p>
-          <button type="button" onClick={() => document.getElementById('fileInput').click()}>Choose File</button>
-          <p>Drag the pre-generated profile picture into the drop area to select it</p>
+          <p>
+            {dragActive
+              ? "Drop your image here"
+              : "Drag and drop your image or click to upload"}
+          </p>
+          <button
+            type="button"
+            onClick={() => document.getElementById("fileInput").click()}
+          >
+            Choose File
+          </button>
+          <p>
+            Drag the pre-generated profile picture into the drop area to select
+            it
+          </p>
           {displayPicture && (
             <div>
               <img
@@ -180,9 +183,29 @@ export default function Profile() {
               />
             </div>
           )}
-          <button type="button" onClick={handleResetProfilePicture}>Reset to Default / Generate profile picture</button>
+          <button type="button" onClick={handleResetProfilePicture}>
+            Reset to Default / Generate profile picture
+          </button>
         </div>
-        <button type="submit">Save Changes</button>
+          <input
+            className={`${styles.h1} ${styles.textarea} ${styles.input}`}
+            type="text"
+            name="displayName"
+            value={userInfo.displayName}
+            onChange={handleInputChange}
+          ></input>
+          <textarea
+            className={`${styles.textarea} ${styles.bio} ${styles.input}`}
+            name="bio"
+            value={userInfo.bio}
+            onChange={handleInputChange}
+            placeholder='Write a bio for your profile!'
+          ></textarea>
+          <div className={styles.p}>Totally Awesome!</div>
+          <button type="submit">Save Changes</button>
+        </div>
+      </div>
+
       </form>
     </div>
   );
