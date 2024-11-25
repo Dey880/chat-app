@@ -62,7 +62,7 @@ strong {
 }
 
 .messageField:focus {
-    outline: solid 2px var(--white);
+    outline: solid 2px var(--yellow);
 }
 
 .name {
