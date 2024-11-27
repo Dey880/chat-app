@@ -276,3 +276,27 @@ app.use((req, res, next) => {
 server.listen(4000, () => {
   console.log("Server is running on http://localhost:4000");
 });
+
+const gracefulShutdown = (signal) => {
+  console.log(`Received ${signal}, closing HTTP server...`);
+  app.close((err) => {
+    if (err) {
+      console.error('Error during server shutdown:', err);
+    } else {
+      console.log('Server closed.');
+    }
+    process.exit(0);
+  });
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception thrown:', err);
+  process.exit(1);
+});
