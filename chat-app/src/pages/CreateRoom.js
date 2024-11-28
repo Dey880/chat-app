@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "../css/CreateRoom.module.css";
 
 export default function CreateRoom({ userId }) {
   const navigate = useNavigate();
@@ -22,14 +23,14 @@ export default function CreateRoom({ userId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const roomData = {
       name,
       description,
       isPublic,
       invitedEmails,
     };
-  
+
     try {
       const response = await fetch("http://localhost:4000/api/rooms", {
         method: "POST",
@@ -39,7 +40,7 @@ export default function CreateRoom({ userId }) {
         credentials: "include",
         body: JSON.stringify(roomData),
       });
-  
+
       if (response.ok) {
         const newRoom = await response.json();
         console.log("Room created successfully:", newRoom);
@@ -50,64 +51,72 @@ export default function CreateRoom({ userId }) {
     } catch (error) {
       console.error("Error creating room:", error);
     }
-  };  
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create a Room</h2>
-      <div>
-        <label>Room Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>Description:</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-      <div>
-        <label>
-          Public:
+    <div className={styles.body}>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <h2>Create a Room</h2>
+        <span className={styles.inputSpan}>
+          <label className={styles.label}> Room Name: </label>
+          <input
+            type="text"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </span>
+        <span className={styles.inputSpan}>
+          <label className={styles.label}> Description: </label>
+          <input
+            type="text"
+            name="desc"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </span>
+        <label className={styles.materialCheckbox}>
           <input
             type="checkbox"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
           />
+          <span className={styles.checkmark}></span>
+          Public?
         </label>
-      </div>
-      {!isPublic && (
-        <div>
-          <label>Invite Users:</label>
+        {!isPublic && (
           <div>
-            <input
-              type="email"
-              value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="Enter user email"
-            />
-            <button type="button" onClick={handleAddEmail}>
-              Add
-            </button>
+            <label className={styles.label}> Invite Users: </label>
+            <div>
+              <input
+                className={styles.inputSpan}
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="Enter User Email"
+              />
+              <button type="button" onClick={handleAddEmail}>
+                {" "}
+                Add{" "}
+              </button>
+            </div>
+            <ul>
+              {invitedEmails.map((email) => (
+                <li key={email}>
+                  {email}{" "}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveEmail(email)}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul>
-            {invitedEmails.map((email) => (
-              <li key={email}>
-                {email}{" "}
-                <button type="button" onClick={() => handleRemoveEmail(email)}>
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <button type="submit">Create Room</button>
-    </form>
+        )}
+        <input type="submit" className={styles.submit} value={"Create Room"} />
+      </form>
+    </div>
   );
 }
