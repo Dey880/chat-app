@@ -62,7 +62,7 @@ export default function Profile() {
     setFile(null);
     setUserInfo((prev) => ({
       ...prev,
-      profilePicture: pfpApi(userInfo.displayName || 'Default User'),
+      profilePicture: pfpApi(userInfo.displayName || `Chatter'n`),
     }));
   };
 
