@@ -5,6 +5,7 @@ import CreateUser from "./pages/CreateUser";
 import LandingPage from "./pages/LandingPage";
 import ChatPage from "./pages/ChatPage";
 import Profile from "./pages/Profile";
+import CreateRoom from "./pages/CreateRoom"
 import './App.css';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/chat/:roomId" element={<ChatPage />} />
+      <Route path="/create" element={<CreateRoom />}/>
     </Routes>
   );
 }
