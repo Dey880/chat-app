@@ -16,7 +16,7 @@ export default function NotFound() {
             changed or is temporarily unavailable.
           </p>
           <p className={styles.output}>
-            Please try to{" "}
+            You can {" "}
             <a href="/login" className={styles.a}>
               log in
             </a>{" "}
