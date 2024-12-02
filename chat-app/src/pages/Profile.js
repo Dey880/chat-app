@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import styles from '../css/Profile.module.css'
@@ -22,13 +22,14 @@ export default function Profile() {
     return name.replace(/[^a-zA-Z0-9 _\-:;.,|]/g, '_');
   };
   
-  const pfpApi = (name) => {
+  const pfpApi = useCallback((name) => {
     const sanitizedDisplayName = sanitizeFileName(name);
     return `https://api.nilskoepke.com/profile-image/?name=${sanitizedDisplayName}&backgroundColor=${color}`;
-  };
-
+  }, [color]);
+  
   useEffect(() => {
-    axios.get("http://localhost:4000/api/user", { withCredentials: true })
+    axios
+      .get('http://localhost:4000/api/user', { withCredentials: true })
       .then((response) => {
         const { displayName, bio, profilePicture } = response.data;
         const profilePfp = profilePicture || pfpApi(displayName || response.data.email);
@@ -40,9 +41,9 @@ export default function Profile() {
       })
       .catch((error) => {
         console.error('Error fetching user info:', error);
-        alert('Error fetching user info, try logging in again!', error)
+        alert('Error fetching user info, try logging in again!', error);
       });
-  }, []);  
+  }, [pfpApi]);  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -114,17 +115,16 @@ export default function Profile() {
     }
 
     try {
-      const response = await axios.put("http://localhost:4000/api/user", formData, {
+      await axios.put('http://localhost:4000/api/user', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
       });
       navigate('/chat');
-
     } catch (error) {
       console.error('Error updating profile:', error);
-    }
+    }    
   };
 
   const displayPicture = file

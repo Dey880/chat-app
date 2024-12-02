@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     displayName: { type: String, default: '' },
     profilePicture: { type: String, default: ''},
     bio: { type: String, default: ''},
-    friends: { type: [String], default: [] },
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -56,10 +56,11 @@ export default function CreateRoom({ userId }) {
   return (
     <div className={styles.body}>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <h2>Create a Room</h2>
+        <h2 className={styles.h2}>Create a Room</h2>
         <span className={styles.inputSpan}>
           <label className={styles.label}> Room Name: </label>
           <input
+            required
             type="text"
             name="name"
             value={name}
@@ -69,6 +70,7 @@ export default function CreateRoom({ userId }) {
         <span className={styles.inputSpan}>
           <label className={styles.label}> Description: </label>
           <input
+            required
             type="text"
             name="desc"
             value={description}
@@ -85,28 +87,32 @@ export default function CreateRoom({ userId }) {
           Public?
         </label>
         {!isPublic && (
-          <div>
+          <div className={styles.inviteDiv}>
             <label className={styles.label}> Invite Users: </label>
-            <div>
-              <input
+            <div className={styles.div}>
+              <span
                 className={styles.inputSpan}
-                type="email"
+              >
+              <input
+                type="text"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="Enter User Email"
-              />
-              <button type="button" onClick={handleAddEmail}>
+                placeholder="Email: "
+                />
+                </span>
+              <button type="button" onClick={handleAddEmail} className={styles.submit}>
                 {" "}
                 Add{" "}
               </button>
             </div>
             <ul>
               {invitedEmails.map((email) => (
-                <li key={email}>
+                <li key={email} className={styles.list}>
                   {email}{" "}
                   <button
                     type="button"
                     onClick={() => handleRemoveEmail(email)}
+                    className={styles.submit}
                   >
                     Remove
                   </button>

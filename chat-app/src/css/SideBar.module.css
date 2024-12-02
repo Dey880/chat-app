@@ -4,6 +4,8 @@
     background-color: var(--dark);
     border-right: 1px solid var(--yellow);
     padding: 0 0 0 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 ul {
@@ -15,4 +17,33 @@ li {
     margin: 0 0 5px 0;
     cursor: pointer;
     width: max-content;
+}
+
+.createButtonContainer {
+    display: flex;
+    position: relative;
+    align-self: center;
+    top: 75%;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+.submit {
+    padding: 1rem 0.75rem;
+    width: 100%;
+    border-radius: 3rem;
+    background-color: var(--grey);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: all 300ms;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+  
+.submit:hover {
+    background-color: var(--yellow);
+    color: var(--grey);
 }

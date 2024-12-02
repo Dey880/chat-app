@@ -104,3 +104,25 @@
 .materialheckbox:hover input[type="checkbox"] ~ .checkmark {
   border-color: var(--yellow);
 }
+
+.div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inviteDiv {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.list {
+  display: flex;
+  align-items: center;
+  color: var(--yellow);
+  gap: 10px;
+}
+
+.h2 {
+  color: var(--yellow);
+}

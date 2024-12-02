@@ -14,23 +14,26 @@ export default function Sidebar({ rooms, selectRoom, onEditRoom, user }) {
             <span onClick={() => selectRoom(room._id)}>
               {room.name} {room.isPublic ? "(Public)" : "(Private)"}
             </span>
-            {
-              (["admin", "moderator"].includes(user.role) ||
-                room.isOwner === user.userId) && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent room selection
-                    onEditRoom(room);
-                  }}
-                  className={styles.editButton}
-                >
-                  Edit
-                </button>
-              )
-            }
+            {/* {(["admin", "moderator"].includes(user.role) ||
+              room.isOwner === user.userId) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditRoom(room);
+                }}
+                className={styles.editButton}
+              >
+                Edit
+              </button>
+            )} */}
           </li>
         ))}
       </ul>
+      <a href="/create" className={styles.createButtonContainer}>
+        <button className={styles.submit}>
+          Create A Room
+        </button>
+      </a>
     </div>
   );
 }
