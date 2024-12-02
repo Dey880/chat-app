@@ -90,17 +90,19 @@ export default function CreateRoom({ userId }) {
           <div className={styles.inviteDiv}>
             <label className={styles.label}> Invite Users: </label>
             <div className={styles.div}>
-              <span
-                className={styles.inputSpan}
-              >
-              <input
-                type="text"
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="Email: "
+              <span className={styles.inputSpan}>
+                <input
+                  type="text"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="Email: "
                 />
-                </span>
-              <button type="button" onClick={handleAddEmail} className={styles.submit}>
+              </span>
+              <button
+                type="button"
+                onClick={handleAddEmail}
+                className={styles.submit}
+              >
                 {" "}
                 Add{" "}
               </button>

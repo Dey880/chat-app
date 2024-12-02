@@ -145,13 +145,13 @@ app.post("/api/rooms/invite", authenticateJWT, async (req, res) => {
 
 app.get("/api/user", authenticateJWT, (req, res) => {
   User.findById(req.userId)
-    .then(user => {
+    .then((user) => {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
       res.json(user);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });

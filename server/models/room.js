@@ -5,7 +5,11 @@ const roomSchema = new mongoose.Schema({
   description: { type: String },
   isPublic: { type: Boolean, default: true },
   invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  isOwner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  isOwner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

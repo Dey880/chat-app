@@ -60,7 +60,9 @@ export default function ChatPage() {
           displayName={displayName}
         />
       ) : (
-        <div className={styles.placeHolder}>Select a room to start chatting!</div>
+        <div className={styles.placeHolder}>
+          Select a room to start chatting!
+        </div>
       )}
     </div>
   );

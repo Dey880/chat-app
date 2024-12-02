@@ -30,9 +30,7 @@ export default function Sidebar({ rooms, selectRoom, onEditRoom, user }) {
         ))}
       </ul>
       <a href="/create" className={styles.createButtonContainer}>
-        <button className={styles.submit}>
-          Create A Room
-        </button>
+        <button className={styles.submit}>Create A Room</button>
       </a>
     </div>
   );
