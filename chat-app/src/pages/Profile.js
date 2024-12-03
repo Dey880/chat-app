@@ -13,24 +13,26 @@ export default function Profile() {
   const [dragActive, setDragActive] = useState(false);
   const navigate = useNavigate();
 
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  const color = `$${r.toString(16).padStart(2, "0")}${g
-    .toString(16)
-    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-
   const sanitizeFileName = (name) => {
     return name.replace(/[^a-zA-Z0-9 _\-:;.,|]/g, "_");
   };
 
-  const pfpApi = useCallback(
-    (name) => {
-      const sanitizedDisplayName = sanitizeFileName(name);
-      return `https://api.nilskoepke.com/profile-image/?name=${sanitizedDisplayName}&backgroundColor=${color}`;
-    },
-    [color]
-  );
+const pfpApi = useCallback(
+  (name) => {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    const color = `${
+      r.toString(16).padStart(2, "0") +
+      g.toString(16).padStart(2, "0") +
+      b.toString(16).padStart(2, "0")
+    }`;
+
+    const sanitizedDisplayName = sanitizeFileName(name);
+    return `https://api.nilskoepke.com/profile-image/?name=${sanitizedDisplayName}&backgroundColor=$${color}`;
+  },
+  []
+);
 
   useEffect(() => {
     axios
@@ -39,6 +41,7 @@ export default function Profile() {
         const { displayName, bio, profilePicture } = response.data;
         const profilePfp =
           profilePicture || pfpApi(displayName || response.data.email);
+        console.log("Generated Profile Picture URL:", profilePfp);
         setUserInfo({
           displayName,
           bio,
@@ -50,7 +53,7 @@ export default function Profile() {
         alert("Error fetching user info, try logging in again!", error);
       });
   }, [pfpApi]);
-
+    
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prev) => ({ ...prev, [name]: value }));

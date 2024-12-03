@@ -88,37 +88,38 @@ export default function ChatRoom({
             You are now connected to {roomName}
           </h1>
           {messages.map((msg, index) => (
-            <>
-              <div key={index} className={styles.messages}>
-                <img
-                  onClick={navigateProfile}
-                  src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`}
-                  alt={msg.displayName || msg.userEmail}
-                  className={styles.profilePicture}
-                />
-                <div className={styles.msgAll}>
-                  <div className={styles.msgInfo}>
-                    <strong className={styles.name}>
-                      {msg.displayName || msg.userEmail}
-                    </strong>
-                    {msg.role && (
-                      <span
-                        className={
-                          msg.role === "admin"
-                            ? styles.admin
-                            : msg.role === "moderator"
-                            ? styles.moderator
-                            : styles.user
-                        }
-                      >
-                        [{msg.role}]
-                      </span>
-                    )}
-                  </div>
-                  <span className={styles.msgSpan}>{msg.message}</span>
+            <div
+              key={msg.createdAt || `fallback-${index}`}
+              className={styles.messages}
+            >
+              <img
+                onClick={navigateProfile}
+                src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`}
+                alt={msg.displayName || msg.userEmail}
+                className={styles.profilePicture}
+              />
+              <div className={styles.msgAll}>
+                <div className={styles.msgInfo}>
+                  <strong className={styles.name}>
+                    {msg.displayName || msg.userEmail}
+                  </strong>
+                  {msg.role && (
+                    <span
+                      className={
+                        msg.role === "admin"
+                          ? styles.admin
+                          : msg.role === "moderator"
+                          ? styles.moderator
+                          : styles.user
+                      }
+                    >
+                      [{msg.role}]
+                    </span>
+                  )}
                 </div>
+                <span className={styles.msgSpan}>{msg.message}</span>
               </div>
-            </>
+            </div>
           ))}
           <div ref={messageEndRef} />
         </div>
