@@ -156,6 +156,48 @@ app.get("/api/user", authenticateJWT, (req, res) => {
     });
 });
 
+app.get("/api/user/pinned-rooms", authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).populate("pinnedRooms", "name description");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ pinnedRooms: user.pinnedRooms || [] });
+  } catch (error) {
+    console.error("Error fetching pinned rooms:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/user/pinned-rooms", authenticateJWT, async (req, res) => {
+  const { roomId } = req.body;
+  const userId = req.userId;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.pinnedRooms && user.pinnedRooms.includes(roomId)) {
+      // If already pinned, unpin the room
+      user.pinnedRooms = user.pinnedRooms.filter((id) => id.toString() !== roomId);
+    } else {
+      // Otherwise, pin the room
+      user.pinnedRooms = user.pinnedRooms || [];
+      user.pinnedRooms.push(roomId);
+    }
+
+    await user.save();
+
+    res.json({ message: "Pinned rooms updated successfully", pinnedRooms: user.pinnedRooms });
+  } catch (error) {
+    console.error("Error updating pinned rooms:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.get("/api/proxy-profile-image", async (req, res) => {
   const { url } = req.query;
 
@@ -338,10 +380,10 @@ io.on("connection", (socket) => {
 
       const formattedMessages = messages.map((msg) => ({
         message: msg.message,
-        displayName: msg.userId.displayName,
-        profilePicture: msg.userId.profilePicture,
-        createdAt: msg.createdAt,
-        role: msg.userId.role,
+        displayName: msg.userId?.displayName || "Detelet user", 
+        profilePicture: msg.userId?.profilePicture || "/uploads/placeholder.jpg",
+        createdAt: msg?.createdAt || "Deleted",
+        role: msg.userId?.role || "Gone",
       }));
 
       socket.emit("previous-messages", formattedMessages.reverse());
