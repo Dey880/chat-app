@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "../css/CreateUser.module.css";
@@ -10,8 +10,21 @@ export default function CreateUser() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [role, setRole] = useState("user");
+  const [userRole, setUserRole] = useState(null); // To store the current user's role (admin, user, etc.)
 
   const navigate = useNavigate();
+
+  // Fetch the current user's role when the component mounts
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/api/user", { withCredentials: true }) // Assuming the API gives user data with role
+      .then((response) => {
+        setUserRole(response.data.role); // Store the role of the logged-in user
+      })
+      .catch((error) => {
+        console.log("Error fetching user role:", error);
+      });
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -81,31 +94,34 @@ export default function CreateUser() {
               />
               <span>User</span>
             </label>
-            <label>
-              <input
-                type="radio"
-                id="admin"
-                name="role-radio"
-                value="admin"
-                checked={role === "admin"}
-                onChange={() => setRole("admin")}
-              />
-              <span>Admin</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                id="moderator"
-                name="role-radio"
-                value="moderator"
-                checked={role === "moderator"}
-                onChange={() => setRole("moderator")}
-              />
-              <span>Moderator</span>
-            </label>
-            <span className={styles.createUserSelection}></span>
+            {userRole === "admin" && (
+              <>
+                <label>
+                  <input
+                    type="radio"
+                    id="admin"
+                    name="role-radio"
+                    value="admin"
+                    checked={role === "admin"}
+                    onChange={() => setRole("admin")}
+                  />
+                  <span>Admin</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    id="moderator"
+                    name="role-radio"
+                    value="moderator"
+                    checked={role === "moderator"}
+                    onChange={() => setRole("moderator")}
+                  />
+                  <span>Moderator</span>
+                </label>
+                <span className={styles.createUserSelection}></span>
+              </>
+            )}
           </div>
-
           <button
             className={`${styles.createUserLoginSubmit} ${styles.createUserLoginInput}`}
             type="submit"

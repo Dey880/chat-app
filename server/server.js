@@ -81,11 +81,22 @@ app.post("/api/rooms", authenticateJWT, async (req, res) => {
   const creatorId = req.userId;
 
   try {
+    const user = await User.findById(creatorId);
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Allow normal users to create private rooms, but only admins can create public rooms.
+    if (isPublic && user.role !== "admin") {
+      return res.status(403).json({ error: "Only admins can create public rooms" });
+    }
+
     const invitedUsers = [];
     for (const email of invitedEmails) {
-      const user = await User.findOne({ email });
-      if (user) {
-        invitedUsers.push(user._id);
+      const invitedUser = await User.findOne({ email });
+      if (invitedUser) {
+        invitedUsers.push(invitedUser._id);
       }
     }
 
@@ -102,7 +113,6 @@ app.post("/api/rooms", authenticateJWT, async (req, res) => {
     });
 
     await newRoom.save();
-
     res.status(201).json(newRoom);
   } catch (error) {
     console.error("Error creating room:", error);
