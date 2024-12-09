@@ -87,7 +87,6 @@ app.post("/api/rooms", authenticateJWT, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Allow normal users to create private rooms, but only admins can create public rooms.
     if (isPublic && user.role !== "admin") {
       return res.status(403).json({ error: "Only admins can create public rooms" });
     }
@@ -261,9 +260,48 @@ app.get("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (room.isOwner.toString() !== req.userId && !["admin", "moderator"].includes(user.role)) {
+      return res.status(403).json({ error: "Unauthorized to view this room" });
+    }
     res.json(room);
   } catch (error) {
     console.error("Error fetching room:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.put("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
+  const { roomId } = req.params;
+  const { name, description, invitedUsers } = req.body;
+  const userId = req.userId;
+
+  try {
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (room.isOwner.toString() !== userId && !["admin", "moderator"].includes(user.role)) {
+      return res.status(403).json({ error: "Unauthorized to edit this room" });
+    }
+
+    room.name = name || room.name;
+    room.description = description || room.description;
+    room.invitedUsers = invitedUsers || room.invitedUsers;
+
+    await room.save();
+    res.json({ message: "Room updated successfully", room });
+  } catch (error) {
+    console.error("Error updating room:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

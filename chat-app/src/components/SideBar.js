@@ -1,7 +1,12 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styles from "../css/SideBar.module.css";
 
-export default function Sidebar({ rooms, selectRoom, onEditRoom, user }) {
+export default function Sidebar({ rooms, selectRoom, user }) {
+  const canEditRoom = (room) => {
+    return room.isOwner === user._id || ["admin", "moderator"].includes(user.role);
+  };
+
   return (
     <div className={styles.sidebar}>
       <h2>Chat Rooms: </h2>
@@ -14,24 +19,17 @@ export default function Sidebar({ rooms, selectRoom, onEditRoom, user }) {
             <span onClick={() => selectRoom(room._id)}>
               {room.name} {room.isPublic ? "(Public)" : "(Private)"}
             </span>
-            {/* {(["admin", "moderator"].includes(user.role) ||
-              room.isOwner === user.userId) && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditRoom(room);
-                }}
-                className={styles.editButton}
-              >
+            {canEditRoom(room) && (
+              <Link to={`/edit-room/${room._id}`} className={styles.editButton}>
                 Edit
-              </button>
-            )} */}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
-      <a href="/create" className={styles.createButtonContainer}>
+      <Link to="/create" className={styles.createButtonContainer}>
         <button className={styles.submit}>Create A Room</button>
-      </a>
+      </Link>
     </div>
   );
 }
