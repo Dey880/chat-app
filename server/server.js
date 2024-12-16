@@ -133,6 +133,7 @@ app.post("/api/rooms/invite", authenticateJWT, async (req, res) => {
     const inviterRole = room.roles.find(
       (role) => role.user._id.toString() === inviterId
     )?.role;
+
     if (!["admin", "moderator"].includes(inviterRole)) {
       return res
         .status(403)
@@ -256,27 +257,36 @@ app.post("/api/login", (req, res) => {
 app.get("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
   const { roomId } = req.params;
   try {
-    const room = await Room.findById(roomId);
+    const room = await Room.findById(roomId).populate("invitedUsers", "email");
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
+
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
     if (room.isOwner.toString() !== req.userId && !["admin", "moderator"].includes(user.role)) {
       return res.status(403).json({ error: "Unauthorized to view this room" });
     }
-    res.json(room);
+
+    const ownerEmail = (await User.findById(room.isOwner)).email;
+    const invitedUsers = room.invitedUsers.filter(
+      (user) => user.email !== ownerEmail
+    );
+
+    res.json({ room, invitedUsers });
   } catch (error) {
     console.error("Error fetching room:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
+
 app.put("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
   const { roomId } = req.params;
-  const { name, description, invitedUsers } = req.body;
+  const { name, description, invitedEmails } = req.body;
   const userId = req.userId;
 
   try {
@@ -296,14 +306,42 @@ app.put("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
 
     room.name = name || room.name;
     room.description = description || room.description;
-    room.invitedUsers = invitedUsers || room.invitedUsers;
 
-    await room.save();
-    res.json({ message: "Room updated successfully", room });
+    // Update invited users based on the passed emails
+    room.invitedUsers = await User.find({ email: { $in: invitedEmails } }).select('_id');
+    
+    const updatedRoom = await room.save();
+    res.json({ message: "Room updated successfully", room: updatedRoom });
   } catch (error) {
     console.error("Error updating room:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+
+app.delete("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    if (room.isOwner.toString() !== userId && !["admin"].includes(req.userRole)) {
+      return res.status(403).json({ error: "Unauthorized to delete this room" });
+    }
+
+    await room.remove();
+    res.json({ message: "Room deleted successfully" });
+
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+await Message.deleteMany({ roomId: roomId });
 });
 
 app.put(

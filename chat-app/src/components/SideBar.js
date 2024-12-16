@@ -4,7 +4,7 @@ import styles from "../css/SideBar.module.css";
 
 export default function Sidebar({ rooms, selectRoom, user }) {
   const canEditRoom = (room) => {
-    return room.isOwner === user._id || ["admin", "moderator"].includes(user.role);
+    return room.isOwner === user.userId || ["admin", "moderator"].includes(user.role);
   };
 
   return (
