@@ -1,28 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "../css/ChatRoom.module.css";
 
-export default function ChatRoom({ roomId, socket, userId, userEmail }) {
-  const [messages, setMessages] = useState([]); // To store messages in state
-  const [newMessage, setNewMessage] = useState(""); // To hold the new message input
+export default function ChatRoom({
+  className,
+  roomId,
+  roomName,
+  socket,
+  userId,
+  userEmail,
+}) {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const messageEndRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.emit("join-room", roomId);
-  
-    // Listen for previous messages when the user joins the room
+
     socket.on("previous-messages", (previousMessages) => {
-      setMessages(previousMessages);
+      setMessages(
+        previousMessages.map((msg) => ({
+          ...msg,
+          role: msg.role || "role",
+        }))
+      );
     });
-  
-    // Listen for new messages and update state when a message is received
+
     socket.on("receive-message", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]); // Add new message to state
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages, message];
+        return updatedMessages;
+      });
     });
-  
-    // Cleanup event listeners when the component unmounts
+
     return () => {
       socket.off("receive-message");
       socket.off("previous-messages");
     };
-  }, [roomId, socket]);  
+  }, [roomId, socket]);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = () => {
     if (!userId || !userEmail) {
@@ -30,36 +50,87 @@ export default function ChatRoom({ roomId, socket, userId, userEmail }) {
       return;
     }
 
-    const messageData = { 
-      roomId, 
-      message: newMessage, 
-      userId, 
-      userEmail 
+    if (newMessage.trim() === "") {
+      return;
+    }
+
+    const userData = JSON.parse(localStorage.getItem("user"));
+    const displayName = userData.displayName || userData.email;
+
+    const messageData = {
+      roomId,
+      message: newMessage,
+      userId,
+      userEmail,
+      displayName,
+      role: userData.role,
     };
 
-    // Emit the message to the server
     socket.emit("send-message", messageData);
-
-    // Clear the input after sending the message
     setNewMessage("");
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
+  const navigateProfile = () => {
+    navigate("/profile");
+  };
+
   return (
-    <div className="chatroom">
-      <div className="messages">
-        {/* Display the list of messages */}
-        {messages.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.userEmail || "Unknown User"}</strong>: {msg.message}
-          </div>
-        ))}
+    <>
+      <div className={className}>
+        <div className={styles.messageContainer}>
+          <h1 className={styles.welcomeMessage}>
+            You are now connected to {roomName}
+          </h1>
+          {messages.map((msg, index) => (
+            <div
+              key={msg.createdAt || `fallback-${index}`}
+              className={styles.messages}
+            >
+              <img
+                onClick={navigateProfile}
+                src={`${process.env.REACT_APP_BACKEND_URL}${msg.profilePicture}`}
+                alt={msg.displayName || msg.userEmail}
+                className={styles.profilePicture}
+              />
+              <div className={styles.msgAll}>
+                <div className={styles.msgInfo}>
+                  <strong className={styles.name}>
+                    {msg.displayName || msg.userEmail}
+                  </strong>
+                  {msg.role && (
+                    <span
+                      className={
+                        msg.role === "admin"
+                          ? styles.admin
+                          : msg.role === "moderator"
+                          ? styles.moderator
+                          : styles.user
+                      }
+                    >
+                      [{msg.role}]
+                    </span>
+                  )}
+                </div>
+                <span className={styles.msgSpan}>{msg.message}</span>
+              </div>
+            </div>
+          ))}
+          <div ref={messageEndRef} />
+        </div>
+        <input
+          className={styles.messageField}
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Message:"
+        />
       </div>
-      <input
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        placeholder="Type your message"
-      />
-      <button onClick={sendMessage}>Send</button>
-    </div>
+    </>
   );
 }

@@ -1,0 +1,25 @@
+.parent {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.ChatRoom {
+    overflow-y: scroll;
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-end;
+    position:fixed;
+    left:20%;
+    width:82vw;
+    height: 100vh;
+}
+
+.placeHolder {
+    width: fit-content;
+    margin: 0 0 0 50px;
+    text-wrap: nowrap;
+}

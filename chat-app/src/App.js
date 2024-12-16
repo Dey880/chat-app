@@ -4,8 +4,11 @@ import Login from "./pages/Login";
 import CreateUser from "./pages/CreateUser";
 import LandingPage from "./pages/LandingPage";
 import ChatPage from "./pages/ChatPage";
-import Profile from "./pages/Profile";  // Assuming this is your profile page
-import './App.css';
+import Profile from "./pages/Profile";
+import CreateRoom from "./pages/CreateRoom";
+import EditRoom from "./pages/EditRoom";
+import NotFound from "./pages/404";
+import "./App.css";
 
 export default function App() {
   return (
@@ -15,13 +18,11 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/createUser" element={<CreateUser />} />
       <Route path="/chat" element={<ChatPage />} />
-      
-      {/* Add a route for the Profile Page */}
       <Route path="/profile" element={<Profile />} />
-      
-      {/* Nested route example */}
       <Route path="/chat/:roomId" element={<ChatPage />} />
-      {/* ":roomId" is a dynamic parameter for the chat room */}
+      <Route path="/create" element={<CreateRoom />} />
+      <Route path="*" element={<NotFound />} />
+      <Route path="/edit-room/:roomId" element={<EditRoom />} />
     </Routes>
   );
 }
