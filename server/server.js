@@ -307,9 +307,13 @@ app.put("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
     room.name = name || room.name;
     room.description = description || room.description;
 
-    // Update invited users based on the passed emails
-    room.invitedUsers = await User.find({ email: { $in: invitedEmails } }).select('_id');
-    
+    const ownerEmail = (await User.findById(room.isOwner)).email;
+    if (!invitedEmails.includes(ownerEmail)) {
+      invitedEmails.push(ownerEmail);
+    }
+    const invitedUserIds = await User.find({ email: { $in: invitedEmails } }).select('_id');
+    room.invitedUsers = invitedUserIds;
+
     const updatedRoom = await room.save();
     res.json({ message: "Room updated successfully", room: updatedRoom });
   } catch (error) {

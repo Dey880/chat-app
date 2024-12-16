@@ -3,16 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import styles from "../css/EditRoom.module.css";
 
 export default function EditRoom() {
-  const { roomId } = useParams(); // To get the roomId from URL
+  const { roomId } = useParams();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [invitedEmails, setInvitedEmails] = useState([]);
   const [emailInput, setEmailInput] = useState("");
-  const [roomOwnerEmail, setRoomOwnerEmail] = useState(""); // Add state for owner email
+  const [roomOwnerEmail, setRoomOwnerEmail] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRoomData = async () => {
+      console.log("Fetching room data...");
       try {
         const roomResponse = await fetch(
           `http://localhost:4000/api/rooms/${roomId}`,
@@ -21,17 +22,23 @@ export default function EditRoom() {
             credentials: "include",
           }
         );
-
+    
         if (roomResponse.ok) {
-          const room = await roomResponse.json();
-          setName(room.name);
-          setDescription(room.description);
-          setInvitedEmails(room.invitedUsers);
-
-          // Assuming the ownerId is part of the room schema
-          const ownerId = room.ownerId; // This is the ownerId stored in the room schema
+          const data = await roomResponse.json();
+          console.log("Room data fetched:", data);
+          const room = data.room;
+    
+          if (room && room.name && room.description) {
+            setName(room.name);
+            setDescription(room.description);
+          } else {
+            console.log("Room data is missing 'name' or 'description'");
+          }
+    
+          setInvitedEmails(data.invitedUsers);
+    
+          const ownerId = room.ownerId;
           if (ownerId) {
-            // Now, fetch the owner's details using ownerId
             const userResponse = await fetch(
               `http://localhost:4000/api/users/${ownerId}`,
               {
@@ -39,20 +46,25 @@ export default function EditRoom() {
                 credentials: "include",
               }
             );
-
+    
             if (userResponse.ok) {
               const user = await userResponse.json();
-              setRoomOwnerEmail(user.email); // Save the owner's email
+              console.log("Room owner data fetched:", user);
+              setRoomOwnerEmail(user.email);
             }
           }
         }
       } catch (error) {
         console.error("Error fetching room data:", error);
       }
-    };
-
+    };    
     fetchRoomData();
   }, [roomId]);
+
+  useEffect(() => {
+    console.log("Name state:", name);
+    console.log("Description state:", description);
+  }, [name, description]);
 
   const handleAddEmail = () => {
     if (
@@ -71,8 +83,8 @@ export default function EditRoom() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure the owner is always included in the invited emails
     const updatedInvitedEmails = [...invitedEmails];
+
     if (
       roomOwnerEmail &&
       !updatedInvitedEmails.some((user) => user.email === roomOwnerEmail)
@@ -83,8 +95,10 @@ export default function EditRoom() {
     const roomData = {
       name,
       description,
-      invitedEmails: updatedInvitedEmails.map((user) => user.email), // Only send the email field
+      invitedEmails: updatedInvitedEmails.map((user) => user.email),
     };
+
+    console.log("Submitting updated room data:", roomData);
 
     try {
       const response = await fetch(
