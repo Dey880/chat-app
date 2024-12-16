@@ -338,15 +338,17 @@ app.delete("/api/rooms/:roomId", authenticateJWT, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized to delete this room" });
     }
 
-    await room.remove();
-    res.json({ message: "Room deleted successfully" });
+    await Room.deleteOne({ _id: roomId });
 
+    await Message.deleteMany({ roomId: roomId });
+
+    res.json({ message: "Room deleted successfully" });
   } catch (error) {
     console.error("Error deleting room:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-await Message.deleteMany({ roomId: roomId });
 });
+
 
 app.put(
   "/api/user",

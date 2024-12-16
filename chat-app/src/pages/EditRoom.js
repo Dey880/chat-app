@@ -13,7 +13,6 @@ export default function EditRoom() {
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      console.log("Fetching room data...");
       try {
         const roomResponse = await fetch(
           `http://localhost:4000/api/rooms/${roomId}`,
@@ -22,21 +21,17 @@ export default function EditRoom() {
             credentials: "include",
           }
         );
-    
+
         if (roomResponse.ok) {
           const data = await roomResponse.json();
-          console.log("Room data fetched:", data);
           const room = data.room;
-    
+
           if (room && room.name && room.description) {
             setName(room.name);
             setDescription(room.description);
-          } else {
-            console.log("Room data is missing 'name' or 'description'");
           }
-    
+
           setInvitedEmails(data.invitedUsers);
-    
           const ownerId = room.ownerId;
           if (ownerId) {
             const userResponse = await fetch(
@@ -46,10 +41,9 @@ export default function EditRoom() {
                 credentials: "include",
               }
             );
-    
+
             if (userResponse.ok) {
               const user = await userResponse.json();
-              console.log("Room owner data fetched:", user);
               setRoomOwnerEmail(user.email);
             }
           }
@@ -57,14 +51,9 @@ export default function EditRoom() {
       } catch (error) {
         console.error("Error fetching room data:", error);
       }
-    };    
+    };
     fetchRoomData();
   }, [roomId]);
-
-  useEffect(() => {
-    console.log("Name state:", name);
-    console.log("Description state:", description);
-  }, [name, description]);
 
   const handleAddEmail = () => {
     if (
@@ -82,7 +71,6 @@ export default function EditRoom() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const updatedInvitedEmails = [...invitedEmails];
 
     if (
@@ -98,8 +86,6 @@ export default function EditRoom() {
       invitedEmails: updatedInvitedEmails.map((user) => user.email),
     };
 
-    console.log("Submitting updated room data:", roomData);
-
     try {
       const response = await fetch(
         `http://localhost:4000/api/rooms/${roomId}`,
@@ -112,16 +98,33 @@ export default function EditRoom() {
           body: JSON.stringify(roomData),
         }
       );
-
       if (response.ok) {
-        const updatedRoom = await response.json();
-        console.log("Room updated successfully:", updatedRoom);
         navigate(`/chat`);
       } else {
         console.error("Failed to update room");
       }
     } catch (error) {
       console.error("Error updating room:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/rooms/${roomId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        alert("Room deleted successfully");
+        navigate(`/chat`);
+      } else {
+        console.error("Failed to delete room");
+      }
+    } catch (error) {
+      console.error("Error deleting room:", error);
     }
   };
 
@@ -149,7 +152,6 @@ export default function EditRoom() {
             onChange={(e) => setDescription(e.target.value)}
           />
         </span>
-
         <div className={styles.inviteDiv}>
           <label className={styles.label}>Invite Users:</label>
           <div className={styles.div}>
@@ -185,6 +187,16 @@ export default function EditRoom() {
           </ul>
         </div>
         <input type="submit" className={styles.submit} value="Update Room" />
+        <h2 className={styles.warning}>
+          SCARY SECTION
+        </h2>
+        <button
+          type="button"
+          onClick={handleDelete}
+          className={styles.deleteButton}
+        >
+          Delete Room
+        </button>
       </form>
     </div>
   );

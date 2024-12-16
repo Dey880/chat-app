@@ -47,3 +47,25 @@ li {
     background-color: var(--yellow);
     color: var(--grey);
 }
+
+.editButton {
+    margin: 0 10px 0 10px;
+    text-decoration: none;
+    color: var(--comp);
+}
+
+.editButton:link {
+    color: var(--comp);
+}
+
+.editButton:visited {
+    color: var(--comp);
+}
+
+.editButton:hover {
+    color: var(--comp);
+}
+
+.editButton:active {
+    color: var(--comp);
+}
